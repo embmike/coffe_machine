@@ -3,7 +3,6 @@
   ******************************************************************************
   * @file           : main.h
   * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
   ******************************************************************************
   * @attention
   *
@@ -59,8 +58,18 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LCD_DISP_Pin GPIO_PIN_15
 #define LCD_DISP_GPIO_Port GPIOJ
+#define OSC32_OUT_Pin GPIO_PIN_15
+#define OSC32_OUT_GPIO_Port GPIOC
+#define OSC32_IN_Pin GPIO_PIN_14
+#define OSC32_IN_GPIO_Port GPIOC
 #define LCD_DISPD7_Pin GPIO_PIN_7
 #define LCD_DISPD7_GPIO_Port GPIOD
+#define OSC_OUT_Pin GPIO_PIN_1
+#define OSC_OUT_GPIO_Port GPIOH
+#define OSC_IN_Pin GPIO_PIN_0
+#define OSC_IN_GPIO_Port GPIOH
+#define LCD_BL_Pin GPIO_PIN_0
+#define LCD_BL_GPIO_Port GPIOK
 #define VCP_TX_Pin GPIO_PIN_10
 #define VCP_TX_GPIO_Port GPIOB
 #define VCP_RX_Pin GPIO_PIN_11
@@ -69,8 +78,6 @@ void Error_Handler(void);
 #define LD1_GPIO_Port GPIOJ
 #define LCD_RST_Pin GPIO_PIN_12
 #define LCD_RST_GPIO_Port GPIOB
-#define LCD_BL_Pin GPIO_PIN_0
-#define LCD_BL_GPIO_Port GPIOK
 
 /* USER CODE BEGIN Private defines */
 

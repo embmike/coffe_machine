@@ -86,3 +86,6 @@ CMakeLists.txt.user*
 /build*/
 /.qtcreator/
 /TraceReports/
+
+# Excluded directories
+/documentation/
