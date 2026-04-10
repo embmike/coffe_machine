@@ -22,6 +22,7 @@
 #include "fmc.h"
 
 /* USER CODE BEGIN 0 */
+#include "mt48lc4m32b2.h"
 
 /* USER CODE END 0 */
 
@@ -69,6 +70,26 @@ void MX_FMC_Init(void)
   }
 
   /* USER CODE BEGIN FMC_Init 2 */
+  /* Disable FMC Bank1 to avoid speculative/cache accesses */
+  FMC_Bank1_R->BTCR[0] &= ~FMC_BCRx_MBKEN;
+
+  {
+    MT48LC4M32B2_Context_t reg_mode;
+
+    reg_mode.TargetBank = FMC_SDRAM_CMD_TARGET_BANK2;
+    reg_mode.RefreshMode = MT48LC4M32B2_AUTOREFRESH_MODE_CMD;
+    reg_mode.RefreshRate = REFRESH_COUNT;
+    reg_mode.BurstLength = MT48LC4M32B2_BURST_LENGTH_1;
+    reg_mode.BurstType = MT48LC4M32B2_BURST_TYPE_SEQUENTIAL;
+    reg_mode.CASLatency = MT48LC4M32B2_CAS_LATENCY_3;
+    reg_mode.OperationMode = MT48LC4M32B2_OPERATING_MODE_STANDARD;
+    reg_mode.WriteBurstMode = MT48LC4M32B2_WRITEBURST_MODE_SINGLE;
+
+    if (MT48LC4M32B2_Init(&hsdram1, &reg_mode) != MT48LC4M32B2_OK)
+    {
+      Error_Handler();
+    }
+  }
 
   /* USER CODE END FMC_Init 2 */
 }

@@ -88,4 +88,8 @@ CMakeLists.txt.user*
 /TraceReports/
 
 # Excluded directories
-/documentation/
+/requirements/doc/
+/TouchGFX/simulator/
+/TouchGFX/build/
+/TouchGFX/config/
+/TouchGFX/generated/

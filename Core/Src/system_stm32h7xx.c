@@ -290,21 +290,12 @@ void SystemInit (void)
 #endif /* USER_VECT_TAB_ADDRESS */
 
 #else
-  if(READ_BIT(RCC->AHB3ENR, RCC_AHB3ENR_FMCEN) == 0U)
-  {
-    /* Enable the FMC interface clock */
-    SET_BIT(RCC->AHB3ENR, RCC_AHB3ENR_FMCEN);
-
-    /*
-     * Disable the FMC bank1 (enabled after reset).
-     * This, prevents CPU speculation access on this bank which blocks the use of FMC during
-     * 24us. During this time the others FMC master (such as LTDC) cannot use it!
-     */
-    FMC_Bank1_R->BTCR[0] = 0x000030D2;
-
-    /* Disable the FMC interface clock */
-    CLEAR_BIT(RCC->AHB3ENR, RCC_AHB3ENR_FMCEN);
-  }
+  /*
+   * extmem_boot already prepares FMC/SDRAM before jumping to the XIP application.
+   * Re-touching the FMC speculative access settings here has caused early startup
+   * bus faults in the XIP path, so the application leaves FMC as handed off by
+   * the bootloader and configures it later through the normal peripheral init path.
+   */
 
   /* Configure the Vector Table location -------------------------------------*/
 #if defined(USER_VECT_TAB_ADDRESS)
