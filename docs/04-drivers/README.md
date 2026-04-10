@@ -63,7 +63,7 @@ Read this chapter first when the symptom is:
 
 Detailed chapter:
 
-- [QSPI / External Flash / XIP](C:/st_apps/coffee_machine/docs/04-drivers/qspi-xip.md)
+- [QSPI / External Flash / XIP](./qspi-xip.md)
 
 ## FMC / SDRAM
 
@@ -82,7 +82,7 @@ Read this chapter first when the symptom is:
 
 Detailed chapter:
 
-- [FMC / SDRAM](C:/st_apps/coffee_machine/docs/04-drivers/fmc-sdram.md)
+- [FMC / SDRAM](./fmc-sdram.md)
 
 ## LTDC / Display
 
@@ -102,7 +102,7 @@ Read this chapter first when the symptom is:
 
 Detailed chapter:
 
-- [LTDC / Display](C:/st_apps/coffee_machine/docs/04-drivers/ltdc-display.md)
+- [LTDC / Display](./ltdc-display.md)
 
 ## UART / Debug Output
 
@@ -121,7 +121,7 @@ Read this chapter first when the symptom is:
 
 Detailed chapter:
 
-- [UART / Debug Output](C:/st_apps/coffee_machine/docs/04-drivers/uart-debug.md)
+- [UART / Debug Output](./uart-debug.md)
 
 ## Recommended Reading Order
 
@@ -160,12 +160,3 @@ Why this order:
 - **There are no useful logs**
   - start with [uart-debug.md](C:/st_apps/coffee_machine/docs/04-drivers/uart-debug.md)
   - then [docs/03-debugging/README.md](C:/st_apps/coffee_machine/docs/03-debugging/README.md)
-
-## Files
-
-Driver chapters:
-
-- [fmc-sdram.md](C:/st_apps/coffee_machine/docs/04-drivers/fmc-sdram.md)
-- [qspi-xip.md](C:/st_apps/coffee_machine/docs/04-drivers/qspi-xip.md)
-- [ltdc-display.md](C:/st_apps/coffee_machine/docs/04-drivers/ltdc-display.md)
-- [uart-debug.md](C:/st_apps/coffee_machine/docs/04-drivers/uart-debug.md)
