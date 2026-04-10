@@ -20,7 +20,7 @@ See:
 TBD.
 
 ## Architecture Overview
-
+### Flow from boot to an app
 ```mermaid
 flowchart TD
     A["Reset @ 0x08000000"]
