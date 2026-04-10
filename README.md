@@ -22,8 +22,9 @@ TBD.
 ## Architecture Overview
 
 ```mermaid
-flowchart LR
-    A["Reset @ 0x08000000"] --> B["extmem_bootloader"]
+flowchart TD
+    A["Reset @ 0x08000000"]
+    A --> B["extmem_bootloader"]
     B --> C["QSPI + SDRAM init"]
     C --> D["Jump to app @ 0x90000000"]
     D --> E["coffee_machine"]
