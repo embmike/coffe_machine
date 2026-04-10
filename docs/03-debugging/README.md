@@ -54,7 +54,8 @@ Use this path for:
 Current status:
 
 - validated and usable
-- preferred application debug workflow
+- requires a short GDB symbol-loading sequence before application breakpoints are reliable
+- preferred workflow when the developer wants to inspect the real bootloader-to-application hand-off
 
 ### Direct App Debug
 
@@ -85,14 +86,25 @@ Expected behavior:
 1. Select the `Debug` build configuration.
 2. Program the application with `flash_app`.
 3. In the Project Explorer, select [coffee_machine](C:/st_apps/coffee_machine/build/VisualGDB/Debug/coffee_machine).
-4. Set breakpoints in application source files through the IDE.
-5. Press `Start`.
+4. Press `Start`.
+5. Delete existing breakpoints through the IDE breakpoint window.
+6. In the GDB Session window, enter:
+
+```gdb
+symbol-file C:/st_apps/coffee_machine/build/VisualGDB/Debug/extmem_bootloader
+add-symbol-file C:/st_apps/coffee_machine/build/VisualGDB/Debug/coffee_machine 0x90000000
+delete breakpoints
+```
+
+7. Set breakpoints in [main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp).
+8. Press `Continue`.
 
 Expected behavior:
 
-- the board starts through the bootloader
-- the bootloader runs without requiring manual GDB intervention
-- the debugger reaches application breakpoints after the jump to the XIP application
+- the debugger starts in the bootloader
+- bootloader symbols are active first
+- application symbols are then added for the XIP address space
+- application breakpoints can be reached after the jump to the XIP application
 
 Typical validated breakpoint locations:
 
@@ -113,15 +125,28 @@ Expected behavior:
 
 ## GDB Workflow
 
-Normal validated workflows no longer require manual GDB commands.
+### Bootloader Debug
 
-That is the desired state.
+No manual GDB commands are expected in the normal workflow.
 
-Use the GDB terminal only for investigation when:
+### Boot-to-App Debug
 
-- a debug profile is being repaired
-- a symbol mapping problem is being analyzed
-- early startup behavior must be diagnosed beyond normal IDE support
+The currently validated workflow does require a short manual GDB sequence:
+
+```gdb
+symbol-file C:/st_apps/coffee_machine/build/VisualGDB/Debug/extmem_bootloader
+add-symbol-file C:/st_apps/coffee_machine/build/VisualGDB/Debug/coffee_machine 0x90000000
+delete breakpoints
+```
+
+After that:
+
+- set application breakpoints in the IDE
+- press `Continue`
+
+### Investigative Work
+
+Additional manual GDB commands may still be used when diagnosing early startup, symbol loading, or debug-profile problems.
 
 ## Typical Pitfalls
 
@@ -144,6 +169,16 @@ Example:
 ### Direct app boot is not the default path
 
 The direct application debug path is experimental and should not be used as the main workflow.
+
+### Boot-to-App breakpoints must be reset after symbol loading
+
+For the currently validated workflow:
+
+- delete IDE breakpoints first
+- load bootloader and application symbols in the GDB Session window
+- delete breakpoints again in GDB
+- then set application breakpoints in the IDE
+- then continue execution
 
 ### If UART output is missing during debugging
 
