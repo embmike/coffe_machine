@@ -56,6 +56,7 @@ Current status:
 - validated and usable
 - requires a short GDB symbol-loading sequence before application breakpoints are reliable
 - preferred workflow when the developer wants to inspect the real bootloader-to-application hand-off
+- depends on specific VisualGDB profile settings that were added to stabilize this path
 
 ### Direct App Debug
 
@@ -105,6 +106,35 @@ Expected behavior:
 - bootloader symbols are active first
 - application symbols are then added for the XIP address space
 - application breakpoints can be reached after the jump to the XIP application
+
+## Project File Settings Behind This Workflow
+
+The validated Boot-to-App debug path is not just a sequence of manual commands. It also depends on project-level VisualGDB settings.
+
+Primary files:
+
+- [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
+- [requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+
+Important settings in the Boot-to-App profile:
+
+- `MainCMakeTarget = coffee_machine`
+- `StartupTarget = coffee_machine`
+- startup command:
+  - `add-symbol-file C:/st_apps/coffee_machine/build/VisualGDB/Debug/extmem_bootloader 0x08000000`
+- empty `StepIntoNewInstanceEntry`
+- startup command:
+  - `mon gdb_breakpoint_override hard`
+- flash patcher disabled:
+  - `FLASHPatcher xsi:nil="true"`
+
+Why these mattered:
+
+- `coffee_machine` had to be the main debug target for normal app-side IDE work
+- the bootloader symbol file still had to be known to the debugger
+- automatic early entry break behavior caused startup issues
+- software-breakpoint / flash-hotpatch behavior was not reliable enough for this boot path
+- hardware breakpoints made the startup path stable enough for practical IDE debugging
 
 Typical validated breakpoint locations:
 

@@ -198,6 +198,10 @@ Current expectation:
 - `flash_app`: no manual GDB input
 - `flash_system`: no manual GDB input
 - normal bootloader debugging: no manual GDB input
-- normal boot-to-app debugging: no manual GDB input
+- normal boot-to-app debugging: requires a short manual GDB symbol-loading sequence
 
-Manual GDB work should be treated as an exception for investigation, not as the default workflow.
+At the current project maturity, Boot-to-App debug is the main exception. The validated sequence is documented in:
+
+- [Debugging](C:/st_apps/coffee_machine/docs/03-debugging/README.md)
+
+Manual GDB work should still be treated as a controlled workflow step, not as ad-hoc trial-and-error.

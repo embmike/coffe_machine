@@ -199,9 +199,58 @@ The stable debug strategy is split by developer use case:
 - application debug via `coffee_machine`
 - board still starts through the bootloader in the validated boot-to-app path
 
+The most important project files behind this are:
+
+- [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
+- [requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+
+These files matter because the runtime architecture alone was not enough. The IDE/debugger startup behavior also had to be aligned with the bootloader-to-application hand-off.
+
+### VisualGDB settings that mattered
+
+The working boot-to-app debug path depended on a few non-obvious VisualGDB settings.
+
+#### 1. The main debug target had to be `coffee_machine`
+
+For the application-oriented debug path, the VisualGDB profile had to use:
+
+- `MainCMakeTarget = coffee_machine`
+- `StartupTarget = coffee_machine`
+
+This allows the application to be the main debug module while the board still boots through the internal bootloader at runtime.
+
+#### 2. Bootloader symbols had to be added explicitly
+
+The boot-to-app debug profile adds the bootloader symbol file during debugger startup:
+
+```gdb
+add-symbol-file C:/st_apps/coffee_machine/build/VisualGDB/Debug/extmem_bootloader 0x08000000
+```
+
+This makes the debugger aware of the internal bootloader address space while `coffee_machine` remains the main debug target.
+
+#### 3. Early automatic "step into main" behavior had to be disabled
+
+The following VisualGDB setting had to be left empty:
+
+- `StepIntoNewInstanceEntry`
+
+In practice, leaving an automatic startup-entry breakpoint enabled caused unstable startup behavior in this multi-stage boot path.
+
 ### Debugger breakpoint behavior
 
 For the current VisualGDB-based boot-to-app debug path, hardware breakpoints had to be enforced to avoid early startup failures caused by software breakpoint / flash hotpatch behavior during the bootloader-to-application transition.
+
+The important settings were:
+
+- `mon gdb_breakpoint_override hard`
+- `FLASHPatcher xsi:nil="true"`
+
+The first forces GDB/OpenOCD breakpoints into hardware-breakpoint mode.
+
+The second disables VisualGDB flash hotpatching for this path.
+
+This combination turned out to be essential for reliable early application breakpoints after startup.
 
 ## ST References
 
