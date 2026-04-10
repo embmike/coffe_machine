@@ -128,6 +128,28 @@ Important settings in the Boot-to-App profile:
 - flash patcher disabled:
   - `FLASHPatcher xsi:nil="true"`
 
+Where to find these:
+
+- [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
+- [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+
+IDE locations and XML hints:
+
+- `add-symbol-file C:/st_apps/coffee_machine/build/VisualGDB/Debug/extmem_bootloader 0x08000000`
+  - VisualGDB: `Debug Settings -> Additional GDB Commands -> after selecting a target`
+  - XML location: `<AdditionalStartupCommands><GDBStartupCommands>...`
+
+- `mon gdb_breakpoint_override hard`
+  - VisualGDB: `Debug Settings -> Startup GDB commands`
+  - XML location: `<DebugMethod><Configuration><StartupCommands>...`
+
+- `FLASHPatcher xsi:nil="true"`
+  - XML-only setting in the current project files
+  - XML location: `<FLASHPatcher xsi:nil="true" />`
+  - files:
+    - [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
+    - [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+
 Why these mattered:
 
 - `coffee_machine` had to be the main debug target for normal app-side IDE work

@@ -250,6 +250,18 @@ The first forces GDB/OpenOCD breakpoints into hardware-breakpoint mode.
 
 The second disables VisualGDB flash hotpatching for this path.
 
+Where to find them:
+
+- `mon gdb_breakpoint_override hard`
+  - [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
+  - [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+  - inside the OpenOCD startup command list
+
+- `FLASHPatcher xsi:nil="true"`
+  - [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
+  - [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+  - as the XML `<FLASHPatcher xsi:nil="true" />` node
+
 This combination turned out to be essential for reliable early application breakpoints after startup.
 
 ## ST References
