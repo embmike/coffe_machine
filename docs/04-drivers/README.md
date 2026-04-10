@@ -9,8 +9,8 @@ Describe both:
 
 ## Driver Chapters
 
-- [FMC / SDRAM](/C:/st_apps/coffee_machine/docs/04-drivers/fmc-sdram.md)
-- [QSPI / External Flash / XIP](/C:/st_apps/coffee_machine/docs/04-drivers/qspi-xip.md)
-- [LTDC / Display](/C:/st_apps/coffee_machine/docs/04-drivers/ltdc-display.md)
-- [UART / Debug Output](/C:/st_apps/coffee_machine/docs/04-drivers/uart-debug.md)
+- [FMC / SDRAM](./docs/04-drivers/fmc-sdram.md)
+- [QSPI / External Flash / XIP](./docs/04-drivers/qspi-xip.md)
+- [LTDC / Display](./docs/04-drivers/ltdc-display.md)
+- [UART / Debug Output](./docs/04-drivers/uart-debug.md)
 
