@@ -9,8 +9,8 @@ Describe both:
 
 ## Driver Chapters
 
-- [FMC / SDRAM](./docs/04-drivers/fmc-sdram.md)
-- [QSPI / External Flash / XIP](./docs/04-drivers/qspi-xip.md)
-- [LTDC / Display](./docs/04-drivers/ltdc-display.md)
-- [UART / Debug Output](./docs/04-drivers/uart-debug.md)
+- [FMC / SDRAM](./fmc-sdram.md)
+- [QSPI / External Flash / XIP](./qspi-xip.md)
+- [LTDC / Display](./ltdc-display.md)
+- [UART / Debug Output](./uart-debug.md)
 
