@@ -25,25 +25,25 @@
 extern "C" {
 #endif
 
-   /* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-   /* USER CODE BEGIN Includes */
+/* USER CODE BEGIN Includes */
 
-   /* USER CODE END Includes */
+/* USER CODE END Includes */
 
-   extern QSPI_HandleTypeDef hqspi;
+extern QSPI_HandleTypeDef hqspi;
 
-   /* USER CODE BEGIN Private defines */
+/* USER CODE BEGIN Private defines */
 
-   /* USER CODE END Private defines */
+/* USER CODE END Private defines */
 
-   void MX_QUADSPI_Init(void);
+void MX_QUADSPI_Init(void);
 
-   /* USER CODE BEGIN Prototypes */
+/* USER CODE BEGIN Prototypes */
    HAL_StatusTypeDef QSPI_EnableMemoryMappedMode(void);
 
-   /* USER CODE END Prototypes */
+/* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
