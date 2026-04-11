@@ -4,13 +4,30 @@
     <Language Id="GB" />
   </Languages>
   <Texts>
-    <TextGroup Id="Group1" />
-    <TextGroup Id="Unsorted">
-      <Text Id="__SingleUse_AE6B" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">Demonstrator for STM32H750B-DK</Translation>
+    <TextGroup Id="splash_screen_1">
+      <Text Id="__SingleUse_8N9G" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">Mike's Coffee Machine</Translation>
       </Text>
-      <Text Id="__SingleUse_7FL4" Alignment="Left" TypographyId="Large">
-        <Translation Language="GB">Mike's Coffee Shop</Translation>
+    </TextGroup>
+    <TextGroup Id="splash_screen" />
+    <TextGroup Id="Unsorted">
+      <Text Id="__SingleUse_OWB3" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">Americano</Translation>
+      </Text>
+      <Text Id="__SingleUse_L7MS" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">Latte</Translation>
+      </Text>
+      <Text Id="__SingleUse_CTQJ" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">Cappucino</Translation>
+      </Text>
+      <Text Id="__SingleUse_GBRQ" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">Espresso</Translation>
+      </Text>
+      <Text Id="__SingleUse_GALA" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">Choose Coffee</Translation>
+      </Text>
+      <Text Id="__SingleUse_F4NB" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">Demonstrator for STM32H750B-DK</Translation>
       </Text>
     </TextGroup>
   </Texts>

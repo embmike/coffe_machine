@@ -219,20 +219,6 @@ void STM32DMA::setupDataCopy(const BlitOp& blitOp)
 
         /* set DMA2D foreground color */
         WRITE_REG(DMA2D->FGCOLR, blitOp.color);
-
-        /* Write DMA2D BGPFCCR register */
-        WRITE_REG(DMA2D->BGPFCCR, dma2dBackgroundColorMode | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
-
-        /* Configure DMA2D Stream source2 address */
-        WRITE_REG(DMA2D->BGMAR, reinterpret_cast<uint32_t>(blitOp.pDst));
-
-        /* Set DMA2D mode */
-        WRITE_REG(DMA2D->CR, DMA2D_M2M_BLEND | DMA2D_IT_TC | DMA2D_CR_START | DMA2D_IT_CE | DMA2D_IT_TE);
-        break;
-    case BLIT_OP_COPY_WITH_ALPHA:
-        /* Set DMA2D color mode and alpha mode */
-        WRITE_REG(DMA2D->FGPFCCR, dma2dForegroundColorMode | (DMA2D_COMBINE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (blitOp.alpha << 24));
-
         /* Write DMA2D BGPFCCR register */
         WRITE_REG(DMA2D->BGPFCCR, dma2dBackgroundColorMode | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
 
@@ -244,11 +230,8 @@ void STM32DMA::setupDataCopy(const BlitOp& blitOp)
         break;
     case BLIT_OP_COPY_L8:
         {
-            bool blend = true;
             const clutData_t* const palette = reinterpret_cast<const clutData_t*>(blitOp.pClut);
-
-            /* Write foreground CLUT memory address */
-            WRITE_REG(DMA2D->FGCMAR, reinterpret_cast<uint32_t>(&palette->data));
+            bool blend = true;
 
             /* Set DMA2D color mode and alpha mode */
             WRITE_REG(DMA2D->FGPFCCR, dma2dForegroundColorMode | (DMA2D_COMBINE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (blitOp.alpha << 24));
@@ -259,7 +242,9 @@ void STM32DMA::setupDataCopy(const BlitOp& blitOp)
             /* Configure DMA2D Stream source2 address */
             WRITE_REG(DMA2D->BGMAR, reinterpret_cast<uint32_t>(blitOp.pDst));
 
-            /* Configure CLUT */
+            /* Write foreground CLUT memory address */
+            WRITE_REG(DMA2D->FGCMAR, reinterpret_cast<uint32_t>(&palette->data));
+
             switch ((Bitmap::ClutFormat)palette->format)
             {
             case Bitmap::CLUT_FORMAT_L8_ARGB8888:
@@ -273,7 +258,6 @@ void STM32DMA::setupDataCopy(const BlitOp& blitOp)
                 }
                 MODIFY_REG(DMA2D->FGPFCCR, (DMA2D_FGPFCCR_CS | DMA2D_FGPFCCR_CCM), (((palette->size - 1) << DMA2D_FGPFCCR_CS_Pos) | (DMA2D_CCM_RGB888 << DMA2D_FGPFCCR_CCM_Pos)));
                 break;
-
             case Bitmap::CLUT_FORMAT_L8_RGB565:
             default:
                 assert(0 && "Unsupported format");
@@ -298,6 +282,19 @@ void STM32DMA::setupDataCopy(const BlitOp& blitOp)
                 WRITE_REG(DMA2D->CR, DMA2D_M2M_PFC | DMA2D_IT_TC | DMA2D_CR_START | DMA2D_IT_CE | DMA2D_IT_TE);
             }
         }
+        break;
+    case BLIT_OP_COPY_WITH_ALPHA:
+        /* Set DMA2D color mode and alpha mode */
+        WRITE_REG(DMA2D->FGPFCCR, dma2dForegroundColorMode | (DMA2D_COMBINE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (blitOp.alpha << 24));
+
+        /* Write DMA2D BGPFCCR register */
+        WRITE_REG(DMA2D->BGPFCCR, dma2dBackgroundColorMode | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
+
+        /* Configure DMA2D Stream source2 address */
+        WRITE_REG(DMA2D->BGMAR, reinterpret_cast<uint32_t>(blitOp.pDst));
+
+        /* Set DMA2D mode */
+        WRITE_REG(DMA2D->CR, DMA2D_M2M_BLEND | DMA2D_IT_TC | DMA2D_CR_START | DMA2D_IT_CE | DMA2D_IT_TE);
         break;
     case BLIT_OP_COPY_ARGB8888:
     case BLIT_OP_COPY_ARGB8888_WITH_ALPHA:
@@ -328,6 +325,7 @@ void STM32DMA::setupDataCopy(const BlitOp& blitOp)
             /* Start DMA2D : M2M Mode */
             WRITE_REG(DMA2D->CR, DMA2D_M2M | DMA2D_IT_TC | DMA2D_CR_START | DMA2D_IT_CE | DMA2D_IT_TE);
         }
+
         break;
     }
 }
@@ -449,7 +447,7 @@ void invalidateTextureCache()
 {
 }
 
-namespace rgb565
+namespace rgb888
 {
 /**
  * @fn void lineFromColor();
@@ -457,7 +455,7 @@ namespace rgb565
  * @brief Renders Canvas Widget chunks using DMA.
  * This functions will not generate an interrupt, and will not affect the DMA queue.
  */
-void lineFromColor(uint16_t* const ptr, const unsigned count, const uint32_t color, const uint8_t alpha, const uint32_t color565)
+void lineFromColor(uint8_t* const ptr, const unsigned count, const uint32_t color, const uint8_t alpha)
 {
     /* Wait for DMA2D to finish last run */
     while ((READ_REG(DMA2D->CR) & DMA2D_CR_START) != 0U);
@@ -466,7 +464,7 @@ void lineFromColor(uint16_t* const ptr, const unsigned count, const uint32_t col
     WRITE_REG(DMA2D->IFCR, DMA2D_FLAG_TC | DMA2D_FLAG_CE | DMA2D_FLAG_TE);
 
     /* DMA2D OPFCCR register configuration */
-    WRITE_REG(DMA2D->OPFCCR, DMA2D_OUTPUT_RGB565);
+    WRITE_REG(DMA2D->OPFCCR, DMA2D_OUTPUT_RGB888);
 
     /* Configure DMA2D data size */
     WRITE_REG(DMA2D->NLR, (1 | (count << DMA2D_NLR_PL_Pos)));
@@ -477,13 +475,13 @@ void lineFromColor(uint16_t* const ptr, const unsigned count, const uint32_t col
     if (alpha < 0xFF)
     {
         /* Write DMA2D BGPFCCR register */
-        WRITE_REG(DMA2D->BGPFCCR, DMA2D_OUTPUT_RGB565 | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
+        WRITE_REG(DMA2D->BGPFCCR, DMA2D_OUTPUT_RGB888 | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
 
         /* Write DMA2D FGPFCCR register */
         WRITE_REG(DMA2D->FGPFCCR, DMA2D_INPUT_A8 | (DMA2D_REPLACE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (alpha << DMA2D_FGPFCCR_ALPHA_Pos));
 
         /* DMA2D FGCOLR register configuration */
-        WRITE_REG(DMA2D->FGCOLR, color);
+        WRITE_REG(DMA2D->FGCOLR, color & (DMA2D_FGCOLR_BLUE | DMA2D_FGCOLR_GREEN | DMA2D_FGCOLR_RED));
 
         /* Configure DMA2D Stream source2 address */
         WRITE_REG(DMA2D->BGMAR, (uint32_t)ptr);
@@ -497,17 +495,17 @@ void lineFromColor(uint16_t* const ptr, const unsigned count, const uint32_t col
     else
     {
         /* Write DMA2D FGPFCCR register */
-        WRITE_REG(DMA2D->FGPFCCR, DMA2D_OUTPUT_RGB565 | (DMA2D_NO_MODIF_ALPHA << DMA2D_FGPFCCR_AM_Pos));
+        WRITE_REG(DMA2D->FGPFCCR, DMA2D_OUTPUT_RGB888 | (DMA2D_NO_MODIF_ALPHA << DMA2D_FGPFCCR_AM_Pos));
 
-        /* Set color */
-        WRITE_REG(DMA2D->OCOLR, color565);
+        /* Set Output Color */
+        WRITE_REG(DMA2D->OCOLR, color);
 
-        /* Enable the Peripheral and Enable the transfer complete interrupt */
+        /* Start DMA2D */
         WRITE_REG(DMA2D->CR, (DMA2D_CR_START | DMA2D_R2M));
     }
 }
 
-void lineFromRGB565(uint16_t* const ptr, const uint16_t* const data, const unsigned count, const uint8_t alpha)
+void lineFromRGB888(uint8_t* const ptr, const uint8_t* const data, const unsigned count, const uint8_t alpha)
 {
     /* Wait for DMA2D to finish last run */
     while ((READ_REG(DMA2D->CR) & DMA2D_CR_START) != 0U);
@@ -516,7 +514,7 @@ void lineFromRGB565(uint16_t* const ptr, const uint16_t* const data, const unsig
     WRITE_REG(DMA2D->IFCR, DMA2D_FLAG_TC | DMA2D_FLAG_CE | DMA2D_FLAG_TE);
 
     /* DMA2D OPFCCR register configuration */
-    WRITE_REG(DMA2D->OPFCCR, DMA2D_OUTPUT_RGB565);
+    WRITE_REG(DMA2D->OPFCCR, DMA2D_OUTPUT_RGB888);
 
     /* Configure DMA2D data size */
     WRITE_REG(DMA2D->NLR, (1 | (count << DMA2D_NLR_PL_Pos)));
@@ -530,10 +528,10 @@ void lineFromRGB565(uint16_t* const ptr, const uint16_t* const data, const unsig
     if (alpha < 0xFF)
     {
         /* Set DMA2D color mode and alpha mode */
-        WRITE_REG(DMA2D->FGPFCCR, DMA2D_INPUT_RGB565 | (DMA2D_COMBINE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (alpha << DMA2D_FGPFCCR_ALPHA_Pos));
+        WRITE_REG(DMA2D->FGPFCCR, DMA2D_INPUT_RGB888 | (DMA2D_COMBINE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (alpha << DMA2D_FGPFCCR_ALPHA_Pos));
 
         /* Write DMA2D BGPFCCR register */
-        WRITE_REG(DMA2D->BGPFCCR, DMA2D_INPUT_RGB565 | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
+        WRITE_REG(DMA2D->BGPFCCR, DMA2D_INPUT_RGB888 | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
 
         /* Configure DMA2D Stream source2 address */
         WRITE_REG(DMA2D->BGMAR, reinterpret_cast<uint32_t>(ptr));
@@ -544,14 +542,14 @@ void lineFromRGB565(uint16_t* const ptr, const uint16_t* const data, const unsig
     else
     {
         /* Set DMA2D color mode and alpha mode */
-        WRITE_REG(DMA2D->FGPFCCR, DMA2D_INPUT_RGB565 | (DMA2D_COMBINE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (alpha << DMA2D_FGPFCCR_ALPHA_Pos));
+        WRITE_REG(DMA2D->FGPFCCR, DMA2D_INPUT_RGB888 | (DMA2D_COMBINE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (alpha << DMA2D_FGPFCCR_ALPHA_Pos));
 
         /* Start DMA2D : M2M Mode */
         WRITE_REG(DMA2D->CR, DMA2D_M2M | DMA2D_CR_START);
     }
 }
 
-void lineFromARGB8888(uint16_t* const ptr, const uint32_t* const data, const unsigned count, const uint8_t alpha)
+void lineFromARGB8888(uint8_t* const ptr, const uint32_t* const data, const unsigned count, const uint8_t alpha)
 {
     /* Wait for DMA2D to finish last run */
     while ((READ_REG(DMA2D->CR) & DMA2D_CR_START) != 0U);
@@ -560,7 +558,7 @@ void lineFromARGB8888(uint16_t* const ptr, const uint32_t* const data, const uns
     WRITE_REG(DMA2D->IFCR, DMA2D_FLAG_TC | DMA2D_FLAG_CE | DMA2D_FLAG_TE);
 
     /* DMA2D OPFCCR register configuration */
-    WRITE_REG(DMA2D->OPFCCR, DMA2D_OUTPUT_RGB565);
+    WRITE_REG(DMA2D->OPFCCR, DMA2D_OUTPUT_RGB888);
 
     /* Configure DMA2D data size */
     WRITE_REG(DMA2D->NLR, (1 | (count << DMA2D_NLR_PL_Pos)));
@@ -575,7 +573,7 @@ void lineFromARGB8888(uint16_t* const ptr, const uint32_t* const data, const uns
     WRITE_REG(DMA2D->FGPFCCR, DMA2D_INPUT_ARGB8888 | (DMA2D_COMBINE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (alpha << DMA2D_FGPFCCR_ALPHA_Pos));
 
     /* Write DMA2D BGPFCCR register */
-    WRITE_REG(DMA2D->BGPFCCR, DMA2D_INPUT_RGB565 | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
+    WRITE_REG(DMA2D->BGPFCCR, DMA2D_INPUT_RGB888 | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
 
     /* Configure DMA2D Stream source2 address */
     WRITE_REG(DMA2D->BGMAR, reinterpret_cast<uint32_t>(ptr));
@@ -584,13 +582,13 @@ void lineFromARGB8888(uint16_t* const ptr, const uint32_t* const data, const uns
     WRITE_REG(DMA2D->CR, DMA2D_M2M_BLEND | DMA2D_CR_START);
 }
 
-void lineFromL8RGB888(uint16_t* const ptr, const uint8_t* const data, const unsigned count, const uint8_t alpha)
+void lineFromL8RGB888(uint8_t* const ptr, const uint8_t* const data, const unsigned count, const uint8_t alpha)
 {
     /* wait for DMA2D to finish last run */
     while ((READ_REG(DMA2D->CR) & DMA2D_CR_START) != 0U);
 
     /* DMA2D OPFCCR register configuration */
-    WRITE_REG(DMA2D->OPFCCR, DMA2D_OUTPUT_RGB565);
+    WRITE_REG(DMA2D->OPFCCR, DMA2D_OUTPUT_RGB888);
 
     /* Configure DMA2D data size */
     WRITE_REG(DMA2D->NLR, (1 | (count << DMA2D_NLR_PL_Pos)));
@@ -619,7 +617,7 @@ void lineFromL8RGB888(uint16_t* const ptr, const uint8_t* const data, const unsi
         SET_BIT(DMA2D->FGPFCCR, DMA2D_FGPFCCR_START);
 
         /* Write DMA2D BGPFCCR register */
-        WRITE_REG(DMA2D->BGPFCCR, DMA2D_INPUT_RGB565 | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
+        WRITE_REG(DMA2D->BGPFCCR, DMA2D_INPUT_RGB888 | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
 
         /* Mark CLUT loaded */
         L8ClutLoaded = 1;
@@ -633,7 +631,7 @@ void lineFromL8RGB888(uint16_t* const ptr, const uint8_t* const data, const unsi
     else
     {
         /* Set correct alpha for these pixels */
-        MODIFY_REG(DMA2D->FGPFCCR, DMA2D_BGPFCCR_ALPHA_Msk, alpha << DMA2D_FGPFCCR_ALPHA_Pos);
+        MODIFY_REG(DMA2D->FGPFCCR, DMA2D_FGPFCCR_ALPHA_Msk, alpha << DMA2D_FGPFCCR_ALPHA_Pos);
     }
 
     /* Start pixel transfer in correct mode */
@@ -649,13 +647,13 @@ void lineFromL8RGB888(uint16_t* const ptr, const uint8_t* const data, const unsi
     }
 }
 
-void lineFromL8ARGB8888(uint16_t* const ptr, const uint8_t* const data, const unsigned count, const uint8_t alpha)
+void lineFromL8ARGB8888(uint8_t* const ptr, const uint8_t* const data, const unsigned count, const uint8_t alpha)
 {
     /* wait for DMA2D to finish last run */
     while ((READ_REG(DMA2D->CR) & DMA2D_CR_START) != 0U);
 
     /* DMA2D OPFCCR register configuration */
-    WRITE_REG(DMA2D->OPFCCR, DMA2D_OUTPUT_RGB565);
+    WRITE_REG(DMA2D->OPFCCR, DMA2D_OUTPUT_RGB888);
 
     /* Configure DMA2D data size */
     WRITE_REG(DMA2D->NLR, (1 | (count << DMA2D_NLR_PL_Pos)));
@@ -678,13 +676,16 @@ void lineFromL8ARGB8888(uint16_t* const ptr, const uint8_t* const data, const un
         /* Set DMA2D color mode and alpha mode */
         WRITE_REG(DMA2D->FGPFCCR, DMA2D_INPUT_L8 | (DMA2D_COMBINE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (alpha << DMA2D_FGPFCCR_ALPHA_Pos));
 
+        /* Set DMA2D color mode and alpha mode */
+        WRITE_REG(DMA2D->FGPFCCR, DMA2D_INPUT_L8 | (DMA2D_COMBINE_ALPHA << DMA2D_FGPFCCR_AM_Pos) | (alpha << DMA2D_FGPFCCR_ALPHA_Pos));
+
         MODIFY_REG(DMA2D->FGPFCCR, (DMA2D_FGPFCCR_CS | DMA2D_FGPFCCR_CCM), (((L8CLUT->size - 1) << DMA2D_FGPFCCR_CS_Pos) | (DMA2D_CCM_ARGB8888 << DMA2D_FGPFCCR_CCM_Pos)));
 
         /* Enable the CLUT loading for the foreground */
         SET_BIT(DMA2D->FGPFCCR, DMA2D_FGPFCCR_START);
 
         /* Write DMA2D BGPFCCR register */
-        WRITE_REG(DMA2D->BGPFCCR, DMA2D_INPUT_RGB565 | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
+        WRITE_REG(DMA2D->BGPFCCR, DMA2D_INPUT_RGB888 | (DMA2D_NO_MODIF_ALPHA << DMA2D_BGPFCCR_AM_Pos));
 
         /* Mark CLUT loaded */
         L8ClutLoaded = 1;
@@ -698,14 +699,14 @@ void lineFromL8ARGB8888(uint16_t* const ptr, const uint8_t* const data, const un
     else
     {
         /* Set correct alpha for these pixels */
-        MODIFY_REG(DMA2D->FGPFCCR, DMA2D_BGPFCCR_ALPHA_Msk, alpha << DMA2D_FGPFCCR_ALPHA_Pos);
+        MODIFY_REG(DMA2D->FGPFCCR, DMA2D_FGPFCCR_ALPHA_Msk, alpha << DMA2D_FGPFCCR_ALPHA_Pos);
     }
 
     /* Start pixel transfer in blending mode */
     WRITE_REG(DMA2D->CR, DMA2D_M2M_BLEND | DMA2D_CR_START);
 }
 
-} // namespace rgb565
+} // namespace rgb888
 } // namespace paint
 } // namespace touchgfx
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -52,6 +52,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+HAL_StatusTypeDef AppDebugLog(const char *format, ...);
 
 /* USER CODE END EFP */
 
@@ -64,6 +65,8 @@ void Error_Handler(void);
 #define OSC32_IN_GPIO_Port GPIOC
 #define LCD_DISPD7_Pin GPIO_PIN_7
 #define LCD_DISPD7_GPIO_Port GPIOD
+#define LD6_Pin GPIO_PIN_13
+#define LD6_GPIO_Port GPIOI
 #define OSC_OUT_Pin GPIO_PIN_1
 #define OSC_OUT_GPIO_Port GPIOH
 #define OSC_IN_Pin GPIO_PIN_0
@@ -74,8 +77,6 @@ void Error_Handler(void);
 #define VCP_TX_GPIO_Port GPIOB
 #define VCP_RX_Pin GPIO_PIN_11
 #define VCP_RX_GPIO_Port GPIOB
-#define LD1_Pin GPIO_PIN_2
-#define LD1_GPIO_Port GPIOJ
 #define LCD_RST_Pin GPIO_PIN_12
 #define LCD_RST_GPIO_Port GPIOB
 

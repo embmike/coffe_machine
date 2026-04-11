@@ -26,6 +26,8 @@
 
 using namespace touchgfx;
 
+extern LTDC_HandleTypeDef hltdc;
+
 namespace
 {
 static uint16_t lcd_int_active_line;
@@ -69,10 +71,8 @@ void TouchGFXGeneratedHAL::enableLCDControllerInterrupt()
     lcd_int_active_line = (LTDC->BPCR & LTDC_BPCR_AVBP_Msk) - 1;
     lcd_int_porch_line = (LTDC->AWCR & LTDC_AWCR_AAH_Msk) - 1;
 
-    /* Sets the Line Interrupt position */
-    LTDC->LIPCR = lcd_int_active_line;
-    /* Line Interrupt Enable            */
-    LTDC->IER |= LTDC_IER_LIE;
+    HAL_LTDC_ProgramLineEvent(&hltdc, lcd_int_active_line);
+    __HAL_LTDC_ENABLE_IT(&hltdc, LTDC_IT_LI);
 }
 
 bool TouchGFXGeneratedHAL::beginFrame()

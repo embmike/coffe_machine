@@ -2,24 +2,274 @@
   "Application": {
     "Screens": [
       {
-        "Name": "spash_screen",
+        "Name": "splash_screen",
         "Components": [
           {
             "Type": "ScalableImage",
-            "Name": "back_ground_image",
+            "Name": "spsc_background_image",
             "Width": 480,
             "Height": 272,
-            "Filename": "splash_background.png",
+            "LockPosition": true,
+            "Filename": "splash_background_420_320.png",
             "ScalingAlgorithm": "Nearest-neighbor"
           },
           {
             "Type": "TextArea",
-            "Name": "text_area_1",
-            "X": 63,
-            "Y": 126,
+            "Name": "spsc_head_text",
+            "X": 18,
+            "Y": 63,
+            "Width": 445,
+            "Height": 41,
+            "LockPosition": true,
+            "TextId": "__SingleUse_8N9G",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 232,
+              "Green": 226,
+              "Blue": 215
+            },
+            "AutoSize": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "spsc_detail_text",
+            "X": 62,
+            "Y": 135,
             "Width": 356,
             "Height": 20,
-            "TextId": "__SingleUse_AE6B",
+            "LockPosition": true,
+            "TextId": "__SingleUse_F4NB",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 222,
+              "Green": 214,
+              "Blue": 200
+            },
+            "AutoSize": true
+          },
+          {
+            "Type": "ScalableImage",
+            "Name": "spsc_steam_image",
+            "X": 330,
+            "Y": 155,
+            "Width": 150,
+            "Height": 117,
+            "Filename": "steam_overlay_04_180_120.png",
+            "ScalingAlgorithm": "Nearest-neighbor"
+          }
+        ],
+        "Interactions": []
+      },
+      {
+        "Name": "slection_screen",
+        "Components": [
+          {
+            "Type": "ScalableImage",
+            "Name": "sesc_background_image",
+            "Width": 480,
+            "Height": 272,
+            "LockPosition": true,
+            "Filename": "splash_background_420_320.png",
+            "ScalingAlgorithm": "Nearest-neighbor"
+          },
+          {
+            "Type": "FlexButton",
+            "Name": "sesc_espresso_button",
+            "X": 85,
+            "Y": 55,
+            "Width": 150,
+            "Height": 100,
+            "LockPosition": true,
+            "ButtonTrigger": {
+              "Type": "TouchButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "ImageButtonStyle",
+                "ImageReleased": "drink_espresso_150_100.png",
+                "ImagePressed": "drink_espresso_150_100.png"
+              },
+              {
+                "Type": "BoxWithBorderButtonStyle",
+                "Width": 150,
+                "Height": 100,
+                "LockToFlexButtonSize": true,
+                "BorderSize": 5,
+                "ColorReleased": {
+                  "Green": 102,
+                  "Blue": 153
+                },
+                "ColorPressed": {
+                  "Green": 153,
+                  "Blue": 204
+                },
+                "ColorBorderReleased": {
+                  "Green": 51,
+                  "Blue": 102
+                },
+                "ColorBorderPressed": {
+                  "Red": 51,
+                  "Green": 102,
+                  "Blue": 153
+                }
+              }
+            ]
+          },
+          {
+            "Type": "FlexButton",
+            "Name": "sesc_cappucino_button",
+            "X": 245,
+            "Y": 55,
+            "Width": 150,
+            "Height": 100,
+            "LockPosition": true,
+            "ButtonTrigger": {
+              "Type": "TouchButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "ImageButtonStyle",
+                "ImageReleased": "drink_cappuccino_150_100.png",
+                "ImagePressed": "drink_cappuccino_150_100.png"
+              },
+              {
+                "Type": "BoxWithBorderButtonStyle",
+                "Width": 150,
+                "Height": 100,
+                "LockToFlexButtonSize": true,
+                "BorderSize": 5,
+                "ColorReleased": {
+                  "Green": 102,
+                  "Blue": 153
+                },
+                "ColorPressed": {
+                  "Green": 153,
+                  "Blue": 204
+                },
+                "ColorBorderReleased": {
+                  "Green": 51,
+                  "Blue": 102
+                },
+                "ColorBorderPressed": {
+                  "Red": 51,
+                  "Green": 102,
+                  "Blue": 153
+                }
+              }
+            ]
+          },
+          {
+            "Type": "TextArea",
+            "Name": "sesc_choose_caffee_text",
+            "X": 168,
+            "Y": 16,
+            "Width": 144,
+            "Height": 20,
+            "LockPosition": true,
+            "TextId": "__SingleUse_GALA",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 232,
+              "Green": 226,
+              "Blue": 215
+            },
+            "AutoSize": true
+          },
+          {
+            "Type": "FlexButton",
+            "Name": "sesc_latte_button",
+            "X": 85,
+            "Y": 163,
+            "Width": 150,
+            "Height": 100,
+            "LockPosition": true,
+            "ButtonTrigger": {
+              "Type": "TouchButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "ImageButtonStyle",
+                "ImageReleased": "drink_latte_150_100.png",
+                "ImagePressed": "drink_latte_150_100.png"
+              },
+              {
+                "Type": "BoxWithBorderButtonStyle",
+                "Width": 150,
+                "Height": 100,
+                "LockToFlexButtonSize": true,
+                "BorderSize": 5,
+                "ColorReleased": {
+                  "Green": 102,
+                  "Blue": 153
+                },
+                "ColorPressed": {
+                  "Green": 153,
+                  "Blue": 204
+                },
+                "ColorBorderReleased": {
+                  "Green": 51,
+                  "Blue": 102
+                },
+                "ColorBorderPressed": {
+                  "Red": 51,
+                  "Green": 102,
+                  "Blue": 153
+                }
+              }
+            ]
+          },
+          {
+            "Type": "FlexButton",
+            "Name": "sesc_americano_button",
+            "X": 245,
+            "Y": 163,
+            "Width": 150,
+            "Height": 100,
+            "LockPosition": true,
+            "ButtonTrigger": {
+              "Type": "TouchButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "ImageButtonStyle",
+                "ImageReleased": "drink_americano_150_100.png",
+                "ImagePressed": "drink_americano_150_100.png"
+              },
+              {
+                "Type": "BoxWithBorderButtonStyle",
+                "Width": 150,
+                "Height": 100,
+                "LockToFlexButtonSize": true,
+                "BorderSize": 5,
+                "ColorReleased": {
+                  "Green": 102,
+                  "Blue": 153
+                },
+                "ColorPressed": {
+                  "Green": 153,
+                  "Blue": 204
+                },
+                "ColorBorderReleased": {
+                  "Green": 51,
+                  "Blue": 102
+                },
+                "ColorBorderPressed": {
+                  "Red": 51,
+                  "Green": 102,
+                  "Blue": 153
+                }
+              }
+            ]
+          },
+          {
+            "Type": "TextArea",
+            "Name": "sesc_espresso_text",
+            "X": 139,
+            "Y": 136,
+            "Width": 43,
+            "Height": 12,
+            "LockPosition": true,
+            "TextId": "__SingleUse_GBRQ",
             "TextRotation": "0",
             "Color": {
               "Red": 222,
@@ -30,21 +280,61 @@
           },
           {
             "Type": "TextArea",
-            "Name": "text_area_2",
-            "X": 50,
-            "Y": 60,
-            "Width": 382,
-            "Height": 48,
-            "TextId": "__SingleUse_7FL4",
+            "Name": "sesc_cappucino_text",
+            "X": 295,
+            "Y": 136,
+            "Width": 51,
+            "Height": 12,
+            "LockPosition": true,
+            "TextId": "__SingleUse_CTQJ",
             "TextRotation": "0",
             "Color": {
-              "Red": 232,
-              "Green": 226,
-              "Blue": 215
+              "Red": 222,
+              "Green": 214,
+              "Blue": 200
+            },
+            "AutoSize": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "sesc_latte_text",
+            "X": 147,
+            "Y": 245,
+            "Width": 26,
+            "Height": 12,
+            "LockPosition": true,
+            "TextId": "__SingleUse_L7MS",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 222,
+              "Green": 214,
+              "Blue": 200
+            },
+            "AutoSize": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "sesc_americano_text",
+            "X": 295,
+            "Y": 245,
+            "Width": 53,
+            "Height": 12,
+            "LockPosition": true,
+            "TextId": "__SingleUse_OWB3",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 222,
+              "Green": 214,
+              "Blue": 200
             },
             "AutoSize": true
           }
         ],
+        "Interactions": []
+      },
+      {
+        "Name": "brewing_screen",
+        "Components": [],
         "Interactions": []
       }
     ],
@@ -54,16 +344,17 @@
       "Width": 480,
       "Height": 272
     },
-    "SelectedColorDepth": 16,
-    "StartupScreenName": "spash_screen",
+    "SelectedColorDepth": 24,
+    "StartupScreenName": "splash_screen",
     "SelectedStartupLanguage": "GB",
     "TouchGfxPath": "../Middlewares/ST/touchgfx",
     "UIPath": ".",
     "AvailableColorDepths": [
-      16
+      24
     ],
     "AvailableLCDs": {
-      "16": "LCD16bpp"
+      "16": "LCD16bpp",
+      "24": "LCD24bpp"
     },
     "AvailableSections": [
       "ExtFlashSection",
@@ -77,23 +368,9 @@
     ],
     "PhysicalButtons": [],
     "FrameworkFeatures": {
-      "LCD16bpp": {
-        "Id": "LCD16bpp",
-        "Features": [
-          {
-            "Id": "TextureMapperImageFormats",
-            "Features": [
-              {
-                "Id": "RGB565",
-                "IsEnabled": true
-              }
-            ]
-          },
-          {
-            "Id": "RGBCompression",
-            "IsEnabled": true
-          }
-        ]
+      "LCD24bpp": {
+        "Id": "LCD24bpp",
+        "IsEnabled": true
       }
     },
     "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j8",

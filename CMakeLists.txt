@@ -23,6 +23,8 @@ set(BOOT_BIN_FILE ${CMAKE_CURRENT_BINARY_DIR}/boot.bin)
 
 set(BSP_ROOT ${CMAKE_CURRENT_LIST_DIR}/Drivers/BSP)
 set(BSP_BOARD_ROOT ${BSP_ROOT}/STM32H750B-DK)
+set(BSP_COMMON_ROOT ${BSP_ROOT}/Components/Common)
+set(BSP_FT5336_ROOT ${BSP_ROOT}/Components/ft5336)
 set(BSP_MT25_ROOT ${BSP_ROOT}/Components/mt25tl01g)
 set(BSP_MT48_ROOT ${BSP_ROOT}/Components/mt48lc4m32b2)
 
@@ -34,8 +36,12 @@ file(GLOB_RECURSE TOUCHGFX_APP_SOURCES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_LIST_DIR}/TouchGFX/generated/texts/src/*.cpp)
 
 set(BSP_DRIVER_SOURCES
+	${BSP_BOARD_ROOT}/stm32h750b_discovery_bus.c
 	${BSP_BOARD_ROOT}/stm32h750b_discovery_qspi.c
 	${BSP_BOARD_ROOT}/stm32h750b_discovery_sdram.c
+	${BSP_BOARD_ROOT}/stm32h750b_discovery_ts.c
+	${BSP_FT5336_ROOT}/ft5336.c
+	${BSP_FT5336_ROOT}/ft5336_reg.c
 	${BSP_MT25_ROOT}/mt25tl01g.c
 	${BSP_MT48_ROOT}/mt48lc4m32b2.c)
 
@@ -72,6 +78,8 @@ if(TARGET BSP)
 		${CMAKE_CURRENT_LIST_DIR}/TouchGFX/generated/images/include
 		${CMAKE_CURRENT_LIST_DIR}/TouchGFX/generated/texts/include
 		${BSP_BOARD_ROOT}
+		${BSP_COMMON_ROOT}
+		${BSP_FT5336_ROOT}
 		${BSP_MT25_ROOT}
 		${BSP_MT48_ROOT}
 		${CMAKE_CURRENT_LIST_DIR}/Core/Inc)

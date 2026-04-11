@@ -24,26 +24,69 @@
 
 #include <STM32TouchController.hpp>
 
+extern "C"
+{
+#include "app_config.h"
+#include "main.h"
+#include "stm32h750b_discovery_ts.h"
+}
+
+namespace
+{
+bool g_touchInitialized = false;
+bool g_touchInitLogged = false;
+bool g_touchWasDown = false;
+int32_t g_lastLoggedX = -1;
+int32_t g_lastLoggedY = -1;
+}
+
 void STM32TouchController::init()
 {
-    /**
-     * Initialize touch controller and driver
-     *
-     */
+    TS_Init_t touchScreenConfig;
+
+    touchScreenConfig.Width = APP_LCD_WIDTH;
+    touchScreenConfig.Height = APP_LCD_HEIGHT;
+    touchScreenConfig.Orientation = TS_SWAP_XY;
+    touchScreenConfig.Accuracy = APP_TOUCH_ACCURACY;
+
+    g_touchInitialized = (BSP_TS_Init(0, &touchScreenConfig) == BSP_ERROR_NONE);
+
+    if (!g_touchInitLogged)
+    {
+        g_touchInitLogged = true;
+        AppDebugLog("touch init: %s\r\n", g_touchInitialized ? "ok" : "failed");
+    }
 }
 
 bool STM32TouchController::sampleTouch(int32_t& x, int32_t& y)
 {
-    /**
-     * By default sampleTouch returns false,
-     * return true if a touch has been detected, otherwise false.
-     *
-     * Coordinates are passed to the caller by reference by x and y.
-     *
-     * This function is called by the TouchGFX framework.
-     * By default sampleTouch is called every tick, this can be adjusted by HAL::setTouchSampleRate(int8_t);
-     *
-     */
+    TS_State_t state = { 0 };
+
+    if (!g_touchInitialized)
+    {
+        return false;
+    }
+
+    if (BSP_TS_GetState(0, &state) == BSP_ERROR_NONE && state.TouchDetected != 0U)
+    {
+        x = (int32_t)state.TouchX;
+        y = (int32_t)state.TouchY;
+
+        if (!g_touchWasDown ||
+            (x < (g_lastLoggedX - 8)) || (x > (g_lastLoggedX + 8)) ||
+            (y < (g_lastLoggedY - 8)) || (y > (g_lastLoggedY + 8)))
+        {
+            AppDebugLog("touch sample: x=%ld y=%ld\r\n", x, y);
+            g_lastLoggedX = x;
+            g_lastLoggedY = y;
+        }
+
+        g_touchWasDown = true;
+        return true;
+    }
+
+    g_touchWasDown = false;
+
     return false;
 }
 

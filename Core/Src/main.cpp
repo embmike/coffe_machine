@@ -21,6 +21,7 @@ extern "C" {
 #include "main.h"
 #include "crc.h"
 #include "dma2d.h"
+#include "i2c.h"
 #include "ltdc.h"
 #include "memorymap.h"
 #include "quadspi.h"
@@ -28,6 +29,7 @@ extern "C" {
 #include "gpio.h"
 #include "fmc.h"
 #include "app_touchgfx.h"
+#include "app_config.h"
 
    /* Private includes ----------------------------------------------------------*/
    /* USER CODE BEGIN Includes */
@@ -47,11 +49,13 @@ extern "C" {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define LCD_WIDTH                    480U
-#define LCD_HEIGHT                   272U
-#define LCD_FRAMEBUFFER_ADDR         0xD0000000U
-#define LCD_FRAMEBUFFER_SIZE_BYTES   (LCD_WIDTH * LCD_HEIGHT * sizeof(uint16_t))
-#define TEST_PATTERN_HOLD_MS         20000U
+#define LCD_WIDTH                    APP_LCD_WIDTH
+#define LCD_HEIGHT                   APP_LCD_HEIGHT
+#define LCD_FRAMEBUFFER_ADDR         APP_LCD_FRAMEBUFFER_ADDR
+#define LCD_BYTES_PER_PIXEL          3U
+#define LCD_FRAMEBUFFER_SIZE_BYTES   (LCD_WIDTH * LCD_HEIGHT * LCD_BYTES_PER_PIXEL)
+#define SHOW_BRINGUP_TEST_PATTERN    APP_SHOW_BRINGUP_TEST_PATTERN
+#define TEST_PATTERN_HOLD_MS         APP_TEST_PATTERN_HOLD_MS
 
 /* USER CODE END PD */
 
@@ -63,8 +67,15 @@ extern "C" {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+typedef struct __attribute__((packed))
+{
+   uint8_t b;
+   uint8_t g;
+   uint8_t r;
+} PixelRGB888;
+
 __attribute__((section(".framebuffer"), aligned(32)))
-static uint16_t frame_buffer[LCD_WIDTH * LCD_HEIGHT];
+static PixelRGB888 frame_buffer[LCD_WIDTH * LCD_HEIGHT];
 
 /* USER CODE END PV */
 
@@ -171,8 +182,13 @@ int main(void)
 
    UartLog("SDRAM self-test passed\r\n");
    UartLog("display enabled\r\n");
+
+#if SHOW_BRINGUP_TEST_PATTERN
    UartLog("holding test pattern for %lu ms\r\n", TEST_PATTERN_HOLD_MS);
    HAL_Delay(TEST_PATTERN_HOLD_MS);
+#else
+   UartLog("skipping test pattern hold, starting TouchGFX\r\n");
+#endif
 
    MX_TouchGFX_Init();
    UartLog("touchgfx initialized\r\n");
@@ -243,10 +259,10 @@ void SystemClock_Config(void)
    RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV2;
    RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
+   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+   {
+      Error_Handler();
+   }
 }
 
 /* USER CODE BEGIN 4 */
@@ -270,10 +286,12 @@ static void Display_Backlight_On(void)
 
 static void DrawColorBars(void)
 {
-   static const uint16_t colors[3] = {
-      0xF800U,
-      0x07E0U,
-      0x001FU
+   static const PixelRGB888 colors[3] = {
+      { 0x00U, 0x00U, 0xFFU },
+      /* Red */
+      { 0x00U, 0xFFU, 0x00U },
+      /* Green */
+      { 0xFFU, 0x00U, 0x00U }  /* Blue */
    };
    uint32_t x = 0;
    uint32_t y = 0;
@@ -301,6 +319,29 @@ static void FlushFrameBuffer(void)
 }
 
 static HAL_StatusTypeDef UartLog(const char *format, ...)
+{
+   char buffer[160];
+   va_list args;
+   int length = 0;
+
+   va_start(args, format);
+   length = vsnprintf(buffer, sizeof(buffer), format, args);
+   va_end(args);
+
+   if (length < 0)
+   {
+      return HAL_ERROR;
+   }
+
+   if ((size_t)length >= sizeof(buffer))
+   {
+      length = (int)(sizeof(buffer) - 1U);
+   }
+
+   return HAL_UART_Transmit(&huart3, (uint8_t *)buffer, (uint16_t)length, 1000U);
+}
+
+extern "C" HAL_StatusTypeDef AppDebugLog(const char *format, ...)
 {
    char buffer[160];
    va_list args;
@@ -378,7 +419,7 @@ static void FatalBlinkLoop(uint16_t delay_ms)
 {
    while (1)
    {
-      HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+      HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
       HAL_Delay(delay_ms);
    }
 }
@@ -389,71 +430,71 @@ static void FatalBlinkLoop(uint16_t delay_ms)
 
 void MPU_Config(void)
 {
-  MPU_Region_InitTypeDef MPU_InitStruct = {0};
+   MPU_Region_InitTypeDef MPU_InitStruct = { 0 };
 
-  /* Disables the MPU */
-  HAL_MPU_Disable();
+   /* Disables the MPU */
+   HAL_MPU_Disable();
 
-  /** Initializes and configures the Region and the memory to be protected
-  */
-  MPU_InitStruct.Enable = MPU_REGION_ENABLE;
-  MPU_InitStruct.Number = MPU_REGION_NUMBER0;
-  MPU_InitStruct.BaseAddress = 0x24000000;
-  MPU_InitStruct.Size = MPU_REGION_SIZE_512KB;
-  MPU_InitStruct.SubRegionDisable = 0x0;
-  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-  MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
-  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
-  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
+   /** Initializes and configures the Region and the memory to be protected
+   */
+   MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+   MPU_InitStruct.Number = MPU_REGION_NUMBER0;
+   MPU_InitStruct.BaseAddress = 0x24000000;
+   MPU_InitStruct.Size = MPU_REGION_SIZE_512KB;
+   MPU_InitStruct.SubRegionDisable = 0x0;
+   MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
+   MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+   MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+   MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+   MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+   MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
-  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
-  /** Initializes and configures the Region and the memory to be protected
-  */
-  MPU_InitStruct.Number = MPU_REGION_NUMBER1;
-  MPU_InitStruct.BaseAddress = 0x90000000;
-  MPU_InitStruct.Size = MPU_REGION_SIZE_256MB;
-  MPU_InitStruct.AccessPermission = MPU_REGION_NO_ACCESS;
-  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
-  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+   /** Initializes and configures the Region and the memory to be protected
+   */
+   MPU_InitStruct.Number = MPU_REGION_NUMBER1;
+   MPU_InitStruct.BaseAddress = 0x90000000;
+   MPU_InitStruct.Size = MPU_REGION_SIZE_256MB;
+   MPU_InitStruct.AccessPermission = MPU_REGION_NO_ACCESS;
+   MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+   MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
-  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
-  /** Initializes and configures the Region and the memory to be protected
-  */
-  MPU_InitStruct.Number = MPU_REGION_NUMBER2;
-  MPU_InitStruct.Size = MPU_REGION_SIZE_128MB;
-  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
-  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
-  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
+   /** Initializes and configures the Region and the memory to be protected
+   */
+   MPU_InitStruct.Number = MPU_REGION_NUMBER2;
+   MPU_InitStruct.Size = MPU_REGION_SIZE_128MB;
+   MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+   MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+   MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+   MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
-  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
-  /** Initializes and configures the Region and the memory to be protected
-  */
-  MPU_InitStruct.Number = MPU_REGION_NUMBER3;
-  MPU_InitStruct.BaseAddress = 0xD0000000;
-  MPU_InitStruct.Size = MPU_REGION_SIZE_256MB;
-  MPU_InitStruct.AccessPermission = MPU_REGION_NO_ACCESS;
-  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
-  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+   /** Initializes and configures the Region and the memory to be protected
+   */
+   MPU_InitStruct.Number = MPU_REGION_NUMBER3;
+   MPU_InitStruct.BaseAddress = 0xD0000000;
+   MPU_InitStruct.Size = MPU_REGION_SIZE_256MB;
+   MPU_InitStruct.AccessPermission = MPU_REGION_NO_ACCESS;
+   MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+   MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+   MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
-  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
-  /** Initializes and configures the Region and the memory to be protected
-  */
-  MPU_InitStruct.Number = MPU_REGION_NUMBER4;
-  MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
-  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+   /** Initializes and configures the Region and the memory to be protected
+   */
+   MPU_InitStruct.Number = MPU_REGION_NUMBER4;
+   MPU_InitStruct.Size = MPU_REGION_SIZE_32MB;
+   MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+   MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
 
-  HAL_MPU_ConfigRegion(&MPU_InitStruct);
-  /* Enables the MPU */
-  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+   HAL_MPU_ConfigRegion(&MPU_InitStruct);
+   /* Enables the MPU */
+   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 
 }
 
@@ -469,7 +510,7 @@ void Error_Handler(void)
    UartLog("Error_Handler reached\r\n");
    while (1)
    {
-      HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+      HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
       HAL_Delay(150U);
    }
    /* USER CODE END Error_Handler_Debug */

@@ -13,6 +13,9 @@ public:
     FrontendApplication(Model& m, FrontendHeap& heap);
     virtual ~FrontendApplication() { }
 
+    void gotoslection_screenScreenNoTransition();
+    void gotobrewing_screenScreenNoTransition();
+
     virtual void handleTickEvent()
     {
         model.tick();
