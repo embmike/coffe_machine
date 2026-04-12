@@ -128,6 +128,49 @@ Current modeled state:
 - high-level brewing phase
 - steam intensity
 
+## CoffeeMachineSimulation Contract
+
+`CoffeeMachineSimulation` is the handwritten domain model behind the demonstrator.
+
+Its job is deliberately narrow:
+
+- accept a selected `CoffeeType`
+- load the matching brewing profile
+- advance a simulated brewing session over time
+- expose a stable snapshot that the TouchGFX model can consume
+
+Important domain types live in:
+
+- [coffee_machine/coffee_machine_simulation.hpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_simulation.hpp)
+
+Most relevant concepts:
+
+- `CoffeeType`
+  - the selected drink variant
+- `CoffeeProfile`
+  - the static recipe-like configuration for one drink
+- `BrewingPhase`
+  - the high-level runtime phase used for UI decisions
+- `SteamLevel`
+  - the coarse steam intensity used for animation timing
+- `BrewingSession`
+  - the view-model style snapshot consumed by TouchGFX
+
+Operational contract:
+
+- `start()` begins a new brewing session from a chosen drink
+- `update(delta_ms)` advances the active session
+- `getSession()` exposes the current immutable snapshot
+- `isFinished()` tells the model when to start the done-hold path
+- `reset()` returns the simulation to an idle state
+
+Why this split matters:
+
+- TouchGFX screens stay focused on presentation
+- brewing timing stays testable outside the UI
+- simulator and board runtime use the same brewing logic
+- future migration from demonstrator logic to real machine state stays possible
+
 ### 5. Touch controller adapter
 
 Touch input enters TouchGFX through:

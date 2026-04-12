@@ -17,20 +17,30 @@ This split was chosen because the STM32H750 device has limited internal flash, w
 
 ## Developer Structure
 
-The runtime architecture explains where code executes.
+The architecture is easiest to understand through three complementary views:
 
-The structure below explains where responsibilities live in the repository.
+1. system structure
+2. runtime control flow
+3. TouchGFX and domain collaboration
+
+## System Structure Diagram
+
+This view answers:
+
+- which big software blocks exist
+- who owns what responsibility
+- where handwritten code, generated code, and hardware drivers meet
 
 ```mermaid
 flowchart TD
-    A["extmem_bootloader<br/>internal-flash boot stage"] --> B["coffee_machine<br/>XIP application"]
-    B --> C["Core<br/>CubeMX startup, HAL init, MPU, clocks"]
-    B --> D["coffee_machine/<br/>app facade, board bootstrap, domain logic"]
-    B --> E["TouchGFX<br/>generated UI + user screens + model/presenter"]
-    C --> F["Drivers/BSP<br/>QSPI, SDRAM, LTDC, TS, FT5336"]
-    D --> F
-    E --> F
-    F --> G["STM32H750B-DK hardware<br/>QSPI, SDRAM, LTDC, I2C4, UART"]
+    BL["extmem_bootloader<br/>internal-flash boot stage"] --> APP["coffee_machine<br/>XIP application"]
+    APP --> CORE["Core<br/>CubeMX startup, HAL init, MPU, clocks"]
+    APP --> APPSUP["coffee_machine/<br/>board facade, app facade, simulation, helpers"]
+    APP --> UI["TouchGFX<br/>generated UI + user screens + model/presenter"]
+    CORE --> DRV["Drivers/BSP<br/>QSPI, SDRAM, LTDC, TS, FT5336, UART"]
+    APPSUP --> DRV
+    UI --> DRV
+    DRV --> HW["STM32H750B-DK hardware<br/>QSPI, SDRAM, LTDC, I2C4, UART"]
 ```
 
 Practical ownership model:
@@ -40,6 +50,58 @@ Practical ownership model:
 - `coffee_machine` owns handwritten app/bootstrap/domain code
 - `TouchGFX` owns the UI structure
 - `Drivers/BSP` owns the board- and component-level hardware adapters
+
+## Runtime Control Flow Diagram
+
+This view answers:
+
+- what happens after reset
+- where the bootloader stops and the application begins
+- how the demonstrator reaches the interactive screens
+
+```mermaid
+flowchart TD
+    A["Reset"] --> B["Boot from internal flash @ 0x08000000"]
+    B --> C["extmem_bootloader"]
+    C --> D["Initialize QSPI and SDRAM"]
+    D --> E["Clean NVIC state and stop SysTick"]
+    E --> F["Set VTOR and MSP for app @ 0x90000000"]
+    F --> G["Jump to coffee_machine"]
+    G --> H["HAL / clocks / MPU / peripherals"]
+    H --> I["CoffeeMachine_DisplayBootstrap()"]
+    I --> J["MX_TouchGFX_Init()"]
+    J --> K["Splash screen"]
+    K --> L["Selection screen"]
+    L --> M["Touch selection"]
+    M --> N["Brewing screen"]
+    N --> O["Auto return to selection"]
+```
+
+## TouchGFX / Simulation Collaboration Diagram
+
+This view answers:
+
+- how UI events become brewing state
+- where `CoffeeMachineSimulation` fits
+- how the brewing screen gets updated
+
+```mermaid
+flowchart TD
+    TOUCH["Touch press on selection screen"] --> SELVIEW["slection_screenView"]
+    SELVIEW --> SELPRES["slection_screenPresenter::startBrewing()"]
+    SELPRES --> MODEL["Model::startBrewing()"]
+    MODEL --> SIM["CoffeeMachineSimulation"]
+    SIM --> SESSION["BrewingSession snapshot"]
+    TICK["FrontendApplication::handleTickEvent()"] --> MODELTICK["Model::tick()"]
+    MODELTICK --> SIM
+    SESSION --> BREWPRES["brewing_screenPresenter"]
+    BREWPRES --> BREWVIEW["brewing_screenView"]
+    BREWVIEW --> VISUALS["Dynamic texts, progress bar, pouring frame, steam animation"]
+```
+
+That collaboration model is described in more detail here:
+
+- [docs/06-touchgfx/README.md](C:/st_apps/coffee_machine/docs/06-touchgfx/README.md)
 
 ## Boot Paths
 
