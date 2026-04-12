@@ -11,26 +11,28 @@ class slection_screenView;
 class slection_screenPresenter : public touchgfx::Presenter, public ModelListener
 {
 public:
-    slection_screenPresenter(slection_screenView& v);
+   slection_screenPresenter(slection_screenView& v);
 
-    /**
-     * The activate function is called automatically when this screen is "switched in"
-     * (ie. made active). Initialization logic can be placed here.
-     */
-    virtual void activate();
+   /**
+    * The activate function is called automatically when this screen is "switched in"
+    * (ie. made active). Initialization logic can be placed here.
+    */
+   virtual void activate();
 
-    /**
-     * The deactivate function is called automatically when this screen is "switched out"
-     * (ie. made inactive). Teardown functionality can be placed here.
-     */
-    virtual void deactivate();
+   /**
+    * The deactivate function is called automatically when this screen is "switched out"
+    * (ie. made inactive). Teardown functionality can be placed here.
+    */
+   virtual void deactivate();
 
-    virtual ~slection_screenPresenter() {}
+   virtual ~slection_screenPresenter() {}
+
+   void startBrewing(CoffeeType type);
 
 private:
-    slection_screenPresenter();
+   slection_screenPresenter();
 
-    slection_screenView& view;
+   slection_screenView& view;
 };
 
 #endif // SLECTION_SCREENPRESENTER_HPP

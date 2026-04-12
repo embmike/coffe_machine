@@ -45,6 +45,10 @@ set(BSP_DRIVER_SOURCES
 	${BSP_MT25_ROOT}/mt25tl01g.c
 	${BSP_MT48_ROOT}/mt48lc4m32b2.c)
 
+set(APP_SUPPORT_SOURCES
+	${CMAKE_CURRENT_LIST_DIR}/Core/Src/coffee_machine_simulation.cpp
+	${CMAKE_CURRENT_LIST_DIR}/Core/Src/countdown_formatter.cpp)
+
 set(EXTMEM_BOOT_SOURCES
 	${CMAKE_CURRENT_LIST_DIR}/ExtMem_Boot/Src/fmc.c
 	${CMAKE_CURRENT_LIST_DIR}/ExtMem_Boot/Src/main.c
@@ -86,7 +90,8 @@ if(TARGET BSP)
 
 	target_sources(BSP PRIVATE
 		${TOUCHGFX_APP_SOURCES}
-		${BSP_DRIVER_SOURCES})
+		${BSP_DRIVER_SOURCES}
+		${APP_SUPPORT_SOURCES})
 
 	get_target_property(BSP_SOURCES BSP SOURCES)
 	if(BSP_SOURCES)

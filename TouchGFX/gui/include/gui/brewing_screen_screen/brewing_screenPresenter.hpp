@@ -1,6 +1,7 @@
 #ifndef BREWING_SCREENPRESENTER_HPP
 #define BREWING_SCREENPRESENTER_HPP
 
+#include "coffee_machine_simulation.hpp"
 #include <gui/model/ModelListener.hpp>
 #include <mvp/Presenter.hpp>
 
@@ -26,6 +27,9 @@ public:
     virtual void deactivate();
 
     virtual ~brewing_screenPresenter() {}
+
+    virtual void onBrewingSessionUpdated(const BrewingSession& session);
+    virtual void onBrewingSessionCompleted();
 
 private:
     brewing_screenPresenter();

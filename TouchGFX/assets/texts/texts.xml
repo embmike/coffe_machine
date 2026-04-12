@@ -4,32 +4,60 @@
     <Language Id="GB" />
   </Languages>
   <Texts>
-    <TextGroup Id="splash_screen_1">
-      <Text Id="__SingleUse_8N9G" Alignment="Left" TypographyId="Large">
-        <Translation Language="GB">Mike's Coffee Machine</Translation>
-      </Text>
-    </TextGroup>
-    <TextGroup Id="splash_screen" />
-    <TextGroup Id="Unsorted">
-      <Text Id="__SingleUse_OWB3" Alignment="Left" TypographyId="Small">
-        <Translation Language="GB">Americano</Translation>
-      </Text>
-      <Text Id="__SingleUse_L7MS" Alignment="Left" TypographyId="Small">
-        <Translation Language="GB">Latte</Translation>
-      </Text>
-      <Text Id="__SingleUse_CTQJ" Alignment="Left" TypographyId="Small">
-        <Translation Language="GB">Cappucino</Translation>
-      </Text>
-      <Text Id="__SingleUse_GBRQ" Alignment="Left" TypographyId="Small">
-        <Translation Language="GB">Espresso</Translation>
-      </Text>
-      <Text Id="__SingleUse_GALA" Alignment="Left" TypographyId="Default">
+    <TextGroup Id="selection_screen">
+      <Text Id="SESC_CHOOSE_COFFEE" Alignment="Left" TypographyId="Default">
         <Translation Language="GB">Choose Coffee</Translation>
       </Text>
-      <Text Id="__SingleUse_F4NB" Alignment="Left" TypographyId="Default">
+      <Text Id="SESC_ESPRESSO" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">Espresso</Translation>
+      </Text>
+      <Text Id="SESC_CAPPUCHINO" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">Cappucino</Translation>
+      </Text>
+      <Text Id="SESC_LATTE" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">Latte</Translation>
+      </Text>
+      <Text Id="SESC_AMERICANO" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">Americano</Translation>
+      </Text>
+    </TextGroup>
+    <TextGroup Id="brewing_screen">
+      <Text Id="BRSC_COFFEE_NAME" Alignment="Center" TypographyId="Default">
+        <Translation Language="GB">Espresso</Translation>
+      </Text>
+      <Text Id="BRSC_BREWING_DYNAMIC_COFFEE_NAME" Alignment="Center" TypographyId="Default">
+        <Translation Language="GB">&lt;&gt;</Translation>
+      </Text>
+      <Text Id="BRSC_COFFEE_CHARACTER" Alignment="Center" TypographyId="Small">
+        <Translation Language="GB">strong &amp; intense</Translation>
+      </Text>
+      <Text Id="BRSC_BREWING_DYNAMIC_COFFEE_CHARACTER" Alignment="Center" TypographyId="Small">
+        <Translation Language="GB">&lt;&gt;</Translation>
+      </Text>
+      <Text Id="BRSC_BREWING_DYNAMIC_COUNTDOWN" Alignment="Center" TypographyId="Default">
+        <Translation Language="GB">&lt;&gt;</Translation>
+      </Text>
+      <Text Id="BRSC_BREWING_COUNT_DOWN" Alignment="Center" TypographyId="Default">
+        <Translation Language="GB">47</Translation>
+      </Text>
+    </TextGroup>
+    <TextGroup Id="splash_screen">
+      <Text Id="SPSC_HEAD" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">Mike's Coffee Machine</Translation>
+      </Text>
+      <Text Id="SPSC_DETAIL" Alignment="Left" TypographyId="Default">
         <Translation Language="GB">Demonstrator for STM32H750B-DK</Translation>
       </Text>
     </TextGroup>
+    <TextGroup Id="font_support">
+      <Text Id="FONT_SUPPORT_DEFAULT" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">Mike's Coffee Machine Demonstrator for STM32H750B-DK Choose Coffee Espresso Cappuccino Latte Americano 0 1 2 3 4 5 6 7 8 9</Translation>
+      </Text>
+      <Text Id="FONT_SUPPORT_SMALL" Alignment="Left" TypographyId="Small">
+        <Translation Language="GB">strong &amp; intense creamy &amp; smooth mild &amp; silky clean &amp; aromatic Espresso Cappuccino Latte Americano</Translation>
+      </Text>
+    </TextGroup>
+    <TextGroup Id="Unsorted" />
   </Texts>
   <Typographies>
     <Typography Id="Default" Font="verdana.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />

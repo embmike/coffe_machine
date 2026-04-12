@@ -1,5 +1,4 @@
 #include <gui/slection_screen_screen/slection_screenView.hpp>
-#include "main.h"
 
 slection_screenView::slection_screenView()
     : espressoPressedCallback(this, &slection_screenView::onEspressoPressed),
@@ -25,20 +24,24 @@ void slection_screenView::tearDownScreen()
 
 void slection_screenView::onEspressoPressed(const touchgfx::AbstractButtonContainer&)
 {
-    AppDebugLog("TouchGFX event: espresso selected\r\n");
+    presenter->startBrewing(CoffeeType::Espresso);
+    application().gotobrewing_screenScreenNoTransition();
 }
 
 void slection_screenView::onCappuccinoPressed(const touchgfx::AbstractButtonContainer&)
 {
-    AppDebugLog("TouchGFX event: cappuccino selected\r\n");
+    presenter->startBrewing(CoffeeType::Cappuccino);
+    application().gotobrewing_screenScreenNoTransition();
 }
 
 void slection_screenView::onLattePressed(const touchgfx::AbstractButtonContainer&)
 {
-    AppDebugLog("TouchGFX event: latte selected\r\n");
+    presenter->startBrewing(CoffeeType::Latte);
+    application().gotobrewing_screenScreenNoTransition();
 }
 
 void slection_screenView::onAmericanoPressed(const touchgfx::AbstractButtonContainer&)
 {
-    AppDebugLog("TouchGFX event: americano selected\r\n");
+    presenter->startBrewing(CoffeeType::Americano);
+    application().gotobrewing_screenScreenNoTransition();
 }

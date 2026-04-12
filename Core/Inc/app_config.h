@@ -13,8 +13,13 @@ extern "C" {
 #define APP_TOUCH_MAX_Y                   APP_LCD_HEIGHT
 #define APP_TOUCH_ACCURACY                5U
 
-#define APP_SHOW_BRINGUP_TEST_PATTERN     1U
+#define APP_SHOW_BRINGUP_TEST_PATTERN     0U
 #define APP_TEST_PATTERN_HOLD_MS          5000U
+#define APP_BREWING_DONE_HOLD_MS          2000U
+
+#define APP_STEAM_TICK_INTERVAL_LOW       65U
+#define APP_STEAM_TICK_INTERVAL_NORMAL    43U
+#define APP_STEAM_TICK_INTERVAL_STRONG    26U
 
 #ifdef __cplusplus
 }

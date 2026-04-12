@@ -21,7 +21,7 @@
             "Width": 445,
             "Height": 41,
             "LockPosition": true,
-            "TextId": "__SingleUse_8N9G",
+            "TextId": "SPSC_HEAD",
             "TextRotation": "0",
             "Color": {
               "Red": 232,
@@ -36,9 +36,9 @@
             "X": 62,
             "Y": 135,
             "Width": 356,
-            "Height": 20,
+            "Height": 24,
             "LockPosition": true,
-            "TextId": "__SingleUse_F4NB",
+            "TextId": "SPSC_DETAIL",
             "TextRotation": "0",
             "Color": {
               "Red": 222,
@@ -164,9 +164,9 @@
             "X": 168,
             "Y": 16,
             "Width": 144,
-            "Height": 20,
+            "Height": 24,
             "LockPosition": true,
-            "TextId": "__SingleUse_GALA",
+            "TextId": "SESC_CHOOSE_COFFEE",
             "TextRotation": "0",
             "Color": {
               "Red": 232,
@@ -269,7 +269,7 @@
             "Width": 43,
             "Height": 12,
             "LockPosition": true,
-            "TextId": "__SingleUse_GBRQ",
+            "TextId": "SESC_ESPRESSO",
             "TextRotation": "0",
             "Color": {
               "Red": 222,
@@ -286,7 +286,7 @@
             "Width": 51,
             "Height": 12,
             "LockPosition": true,
-            "TextId": "__SingleUse_CTQJ",
+            "TextId": "SESC_CAPPUCHINO",
             "TextRotation": "0",
             "Color": {
               "Red": 222,
@@ -303,7 +303,7 @@
             "Width": 26,
             "Height": 12,
             "LockPosition": true,
-            "TextId": "__SingleUse_L7MS",
+            "TextId": "SESC_LATTE",
             "TextRotation": "0",
             "Color": {
               "Red": 222,
@@ -320,7 +320,7 @@
             "Width": 53,
             "Height": 12,
             "LockPosition": true,
-            "TextId": "__SingleUse_OWB3",
+            "TextId": "SESC_AMERICANO",
             "TextRotation": "0",
             "Color": {
               "Red": 222,
@@ -334,7 +334,123 @@
       },
       {
         "Name": "brewing_screen",
-        "Components": [],
+        "Components": [
+          {
+            "Type": "ScalableImage",
+            "Name": "brsc_background_image",
+            "Width": 480,
+            "Height": 272,
+            "LockPosition": true,
+            "Filename": "splash_background_420_320.png",
+            "ScalingAlgorithm": "Nearest-neighbor"
+          },
+          {
+            "Type": "ScalableImage",
+            "Name": "brsc_brewing_hero_image",
+            "X": 156,
+            "Y": 76,
+            "Width": 180,
+            "Height": 120,
+            "LockPosition": true,
+            "Filename": "pouring_frame_10_180_120.png",
+            "ScalingAlgorithm": "Nearest-neighbor"
+          },
+          {
+            "Type": "BoxProgress",
+            "Name": "brsc_brewing_progess_bar",
+            "X": 96,
+            "Y": 218,
+            "Width": 300,
+            "Height": 10,
+            "LockPosition": true,
+            "Color": {
+              "Red": 232,
+              "Green": 226,
+              "Blue": 215
+            },
+            "Direction": "Right",
+            "FileNameBackground": "__generated\\alternate_theme_images_widgets_boxprogress_normal_medium.png",
+            "IndicatorPositionWidth": 300,
+            "IndicatorPositionHeight": 10,
+            "ProgressRangeMax": 100,
+            "ProgressInitialValue": 60
+          },
+          {
+            "Type": "TextArea",
+            "Name": "brsc_brewing_count_down",
+            "X": 240,
+            "Y": 236,
+            "Width": 26,
+            "Height": 24,
+            "LockPosition": true,
+            "TextId": "BRSC_BREWING_COUNT_DOWN",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 232,
+              "Green": 226,
+              "Blue": 215
+            }
+          },
+          {
+            "Type": "AnimatedImage",
+            "Name": "brsc_brewing_animated_image",
+            "X": 156,
+            "Y": 76,
+            "Width": 180,
+            "Height": 120,
+            "Visible": false,
+            "LockPosition": true,
+            "FileNameFirst": "pouring_frame_01_180_120.png",
+            "FileNameLast": "pouring_frame_10_180_120.png",
+            "UpdateTicksInterval": 10,
+            "StartOnLoad": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "brsc_coffee_character_text",
+            "X": 205,
+            "Y": 48,
+            "Width": 82,
+            "Height": 12,
+            "LockPosition": true,
+            "TextId": "BRSC_COFFEE_CHARACTER",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 232,
+              "Green": 226,
+              "Blue": 215
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "brsc_caffee_name_text",
+            "X": 202,
+            "Y": 16,
+            "Width": 88,
+            "Height": 24,
+            "LockPosition": true,
+            "TextId": "BRSC_COFFEE_NAME",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 232,
+              "Green": 226,
+              "Blue": 215
+            }
+          },
+          {
+            "Type": "AnimatedImage",
+            "Name": "brsc_caffee_steam",
+            "X": 156,
+            "Y": 30,
+            "Width": 180,
+            "Height": 120,
+            "LockPosition": true,
+            "FileNameFirst": "steam_overlay_01_180_120.png",
+            "FileNameLast": "steam_overlay_04_180_120.png",
+            "UpdateTicksInterval": 10,
+            "LoopEnabled": true
+          }
+        ],
         "Interactions": []
       }
     ],

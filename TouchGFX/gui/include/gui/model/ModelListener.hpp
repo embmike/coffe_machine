@@ -6,16 +6,26 @@
 class ModelListener
 {
 public:
-    ModelListener() : model(0) {}
+   ModelListener()
+      : model(0) {}
     
-    virtual ~ModelListener() {}
+   virtual ~ModelListener() {}
 
-    void bind(Model* m)
-    {
-        model = m;
-    }
+   void bind(Model* m)
+   {
+      model = m;
+   }
+
+   virtual void onBrewingSessionUpdated(const BrewingSession& session)
+   {
+      (void)session;
+   }
+
+   virtual void onBrewingSessionCompleted()
+   {
+   }
 protected:
-    Model* model;
+   Model* model;
 };
 
 #endif // MODELLISTENER_HPP
