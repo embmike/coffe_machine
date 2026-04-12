@@ -12,18 +12,6 @@ Coffee machine demonstrator for the **STM32H750B-DK** with:
 
 The project is a demonstrator for a small embedded coffee machine UI on the **STM32H750B-DK**.
 
-### Splash screen
-
-<img src="https://github.com/embmike/coffe_machine/blob/main/Images/splash_screen.jpeg" alt="Splash screen screenshot" width="30%" />
-
-### Selection screen
-
-<img src="https://github.com/embmike/coffe_machine/blob/main/Images/selection_screen.jpeg" alt="Selection screen screenshot" width="30%" />
-
-## Brewing screen
-
-<img src="https://github.com/embmike/coffe_machine/blob/main/Images/brewing_screen.jpeg" alt="Brewing screen screenshot" width="30%" />
-
 At runtime it:
 
 - boots through an internal bootloader
@@ -35,11 +23,23 @@ At runtime it:
 The current demonstrator flow is:
 
 1. splash screen
-2. automatic transition after `5 s`
-3. selection screen
-4. touch-based drink selection
-5. brewing screen with progress, countdown, pouring animation, and steam animation
-6. automatic return to the selection screen
+
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/splash_screen.jpeg" alt="Splash screen screenshot" width="30%" />
+
+3. automatic transition after `5 s`
+
+5. selection screen
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/selection_screen.jpeg" alt="Selection screen screenshot" width="30%" />
+
+6. touch-based drink selection
+
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/selection_screen.jpeg" alt="Selection a coffe screen screenshot" width="30%" />
+
+8. brewing screen with progress, countdown, pouring animation, and steam animation
+
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/brewing_screen.jpeg" alt="Brewing screenshot" width="30%" />
+   
+10. automatic return to the selection screen
 
 Current drink variants:
 
