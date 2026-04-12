@@ -101,7 +101,76 @@ flowchart TD
 
 That collaboration model is described in more detail here:
 
-- [docs/06-touchgfx/README.md](C:/st_apps/coffee_machine/docs/06-touchgfx/README.md)
+- [docs/06-touchgfx/README.md](../06-touchgfx/README.md)
+
+## CoffeeMachineSimulation Mini Class Diagram
+
+This small domain view answers:
+
+- which domain types exist behind the brewing demonstrator
+- which data is static and which data is runtime state
+- what `CoffeeMachineSimulation` exposes to the TouchGFX model
+
+```mermaid
+classDiagram
+    class CoffeeType {
+        <<enum>>
+        Espresso
+        Cappuccino
+        Latte
+        Americano
+    }
+
+    class BrewingPhase {
+        <<enum>>
+        Idle
+        Brewing
+        Finished
+    }
+
+    class SteamLevel {
+        <<enum>>
+        Off
+        Low
+        Normal
+        Strong
+    }
+
+    class CoffeeProfile {
+        +CoffeeType type
+        +const char* name
+        +const char* character
+        +uint32_t durationMs
+    }
+
+    class BrewingSession {
+        +CoffeeType type
+        +BrewingPhase phase
+        +SteamLevel steamLevel
+        +uint32_t elapsedMs
+        +uint32_t remainingMs
+        +uint8_t progressPercent
+        +const char* coffeeName
+        +const char* coffeeCharacter
+    }
+
+    class CoffeeMachineSimulation {
+        -BrewingSession session_
+        -const CoffeeProfile* profile_
+        +start(type)
+        +update(deltaMs)
+        +reset()
+        +isFinished()
+        +getSession()
+    }
+
+    CoffeeProfile --> CoffeeType
+    BrewingSession --> CoffeeType
+    BrewingSession --> BrewingPhase
+    BrewingSession --> SteamLevel
+    CoffeeMachineSimulation --> CoffeeProfile
+    CoffeeMachineSimulation --> BrewingSession
+```
 
 ## Boot Paths
 
