@@ -8,27 +8,21 @@ Coffee machine demonstrator for the **STM32H750B-DK** with:
 - TouchGFX user interface with touch input
 - UART-based developer diagnostics
 
-## User View
+## 1) What does the application do?
 
-TBD.
+The project is a demonstrator for a small embedded coffee machine UI on the **STM32H750B-DK**.
 
-## Main Screens
-
-## Splash screen
+### Splash screen
 
 <img src="https://github.com/embmike/coffe_machine/blob/main/Images/splash_screen.jpeg" alt="Splash screen screenshot" width="30%" />
 
-## Selection screen
+### Selection screen
 
 <img src="https://github.com/embmike/coffe_machine/blob/main/Images/selection_screen.jpeg" alt="Selection screen screenshot" width="30%" />
 
 ## Brewing screen
 
 <img src="https://github.com/embmike/coffe_machine/blob/main/Images/brewing_screen.jpeg" alt="Brewing screen screenshot" width="30%" />
-
-## 1) What does the application do?
-
-The project is a demonstrator for a small embedded coffee machine UI on the **STM32H750B-DK**.
 
 At runtime it:
 
