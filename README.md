@@ -4,6 +4,23 @@
 
 TBD.
 
+## Splash screen
+
+<img src="./images/brewing_screen.jpeg)" alt="Splash screen screenshot" width="30%" />
+
+## Selection screen
+
+<img src="./images/selection_screen.jpeg)" alt="Selection screen screenshot" width="30%" />
+
+## Choose a coffee on Selection screen
+
+<img src="./images/choose_a_coffee.jpeg)" alt="Choose a coffee screen screenshot" width="30%" />
+
+## Brewing screen
+
+<img src="./images/brewing_screen.jpeg.jpeg)" alt="Brewing screen screenshot" width="30%" />
+
+
 ## 3) Architecture overview for the developer
 
 This project is built around a two-stage runtime:
