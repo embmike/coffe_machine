@@ -33,7 +33,7 @@ The current demonstrator flow is:
 
 6. touch-based drink selection
 
-<img src="https://github.com/embmike/coffe_machine/blob/main/Images/selection_screen.jpeg" alt="Selection a coffe screen screenshot" width="30%" />
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/choose_a_coffee.jpeg" alt="Selection a coffe screen screenshot" width="30%" />
 
 8. brewing screen with progress, countdown, pouring animation, and steam animation
 
