@@ -41,7 +41,11 @@ extern QSPI_HandleTypeDef hqspi;
 void MX_QUADSPI_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-   HAL_StatusTypeDef QSPI_EnableMemoryMappedMode(void);
+/**
+ * @brief Switches the external QSPI flash into memory-mapped XIP mode.
+ * @return HAL_OK on success, HAL_ERROR if the BSP handoff fails.
+ */
+HAL_StatusTypeDef QSPI_EnableMemoryMappedMode(void);
 
 /* USER CODE END Prototypes */
 

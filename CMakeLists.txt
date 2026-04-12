@@ -45,8 +45,16 @@ set(BSP_DRIVER_SOURCES
 	${BSP_MT48_ROOT}/mt48lc4m32b2.c)
 
 set(APP_SUPPORT_SOURCES
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/coffee_machine_app.cpp
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/coffee_machine_board.cpp
 	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/coffee_machine_simulation.cpp
 	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/countdown_formatter.cpp)
+
+set(APP_SUPPORT_HEADERS
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/coffee_machine_app.hpp
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/coffee_machine_board.hpp
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/coffee_machine_simulation.hpp
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/countdown_formatter.hpp)
 
 set(EXTMEM_BOOT_SOURCES
 	${CMAKE_CURRENT_LIST_DIR}/ExtMem_Boot/Src/fmc.c
@@ -91,7 +99,8 @@ if(TARGET BSP)
 	target_sources(BSP PRIVATE
 		${TOUCHGFX_APP_SOURCES}
 		${BSP_DRIVER_SOURCES}
-		${APP_SUPPORT_SOURCES})
+		${APP_SUPPORT_SOURCES}
+		${APP_SUPPORT_HEADERS})
 
 	get_target_property(BSP_SOURCES BSP SOURCES)
 	if(BSP_SOURCES)
@@ -99,6 +108,13 @@ if(TARGET BSP)
 		list(FILTER BSP_SOURCES EXCLUDE REGEX ".*/TouchGFX/simulator/.*")
 		set_property(TARGET BSP PROPERTY SOURCES "${BSP_SOURCES}")
 	endif()
+
+	source_group(TREE ${CMAKE_CURRENT_LIST_DIR}/coffee_machine
+		PREFIX "Header Files\\coffee_machine"
+		FILES ${APP_SUPPORT_HEADERS})
+	source_group(TREE ${CMAKE_CURRENT_LIST_DIR}/coffee_machine
+		PREFIX "Source Files\\coffee_machine"
+		FILES ${APP_SUPPORT_SOURCES})
 endif()
 
 target_link_libraries(coffee_machine PRIVATE

@@ -52,6 +52,11 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+/**
+ * @brief Sends a formatted debug line over the configured UART backend.
+ * @param format printf-style format string.
+ * @return HAL status from the UART transmit call.
+ */
 HAL_StatusTypeDef AppDebugLog(const char *format, ...);
 
 /* USER CODE END EFP */

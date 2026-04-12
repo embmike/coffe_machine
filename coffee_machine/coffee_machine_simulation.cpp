@@ -7,7 +7,49 @@ constexpr CoffeeProfile kCoffeeProfiles[] = {
     { CoffeeType::Cappuccino, "Cappuccino", "creamy & smooth", 45000U },
     { CoffeeType::Latte, "Latte", "mild & silky", 65000U },
     { CoffeeType::Americano, "Americano", "clean & aromatic", 40000U }
-};
+}; ///< Static drink catalogue used by the demonstrator and TouchGFX screens.
+}
+
+const CoffeeProfile* CoffeeMachine_FindProfile(CoffeeType type)
+{
+    for (const CoffeeProfile& profile : kCoffeeProfiles)
+    {
+        if (profile.type == type)
+        {
+            return &profile;
+        }
+    }
+
+    return nullptr;
+}
+
+const char* CoffeeMachine_GetCoffeeName(CoffeeType type)
+{
+    const CoffeeProfile* profile = CoffeeMachine_FindProfile(type);
+    return (profile != nullptr) ? profile->name : "";
+}
+
+const char* CoffeeMachine_GetCoffeeCharacter(CoffeeType type)
+{
+    const CoffeeProfile* profile = CoffeeMachine_FindProfile(type);
+    return (profile != nullptr) ? profile->character : "";
+}
+
+const char* CoffeeMachine_GetCoffeeLogName(CoffeeType type)
+{
+    switch (type)
+    {
+    case CoffeeType::Espresso:
+        return "espresso";
+    case CoffeeType::Cappuccino:
+        return "cappuccino";
+    case CoffeeType::Latte:
+        return "latte";
+    case CoffeeType::Americano:
+        return "americano";
+    default:
+        return "unknown";
+    }
 }
 
 CoffeeMachineSimulation::CoffeeMachineSimulation()
@@ -131,15 +173,7 @@ const BrewingSession& CoffeeMachineSimulation::getSession() const
 
 const CoffeeProfile* CoffeeMachineSimulation::findProfile(CoffeeType type) const
 {
-    for (const CoffeeProfile& profile : kCoffeeProfiles)
-    {
-        if (profile.type == type)
-        {
-            return &profile;
-        }
-    }
-
-    return nullptr;
+    return CoffeeMachine_FindProfile(type);
 }
 
 void CoffeeMachineSimulation::updateDerivedState()

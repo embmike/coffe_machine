@@ -28,17 +28,13 @@ extern "C" {
 #include "usart.h"
 #include "gpio.h"
 #include "fmc.h"
-#include "app_touchgfx.h"
-#include "app_config.h"
 
    /* Private includes ----------------------------------------------------------*/
    /* USER CODE BEGIN Includes */
-#include <stdarg.h>
-#include <stdio.h>
-#include "string.h"
-#include "stm32h750b_discovery_qspi.h"
-#include "stm32h750b_discovery_sdram.h"
 } // extern "C"
+
+#include "coffee_machine_app.hpp"
+#include "coffee_machine_board.hpp"
 
 /* USER CODE END Includes */
 
@@ -49,13 +45,6 @@ extern "C" {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define LCD_WIDTH                    APP_LCD_WIDTH
-#define LCD_HEIGHT                   APP_LCD_HEIGHT
-#define LCD_FRAMEBUFFER_ADDR         APP_LCD_FRAMEBUFFER_ADDR
-#define LCD_BYTES_PER_PIXEL          3U
-//#define LCD_FRAMEBUFFER_SIZE_BYTES   (LCD_WIDTH * LCD_HEIGHT * LCD_BYTES_PER_PIXEL)
-#define SHOW_BRINGUP_TEST_PATTERN    APP_SHOW_BRINGUP_TEST_PATTERN
-#define TEST_PATTERN_HOLD_MS         APP_TEST_PATTERN_HOLD_MS
 
 /* USER CODE END PD */
 
@@ -67,35 +56,13 @@ extern "C" {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-typedef struct __attribute__((packed))
-{
-   uint8_t b;
-   uint8_t g;
-   uint8_t r;
-} PixelRGB888;
-
-__attribute__((section(".framebuffer"), aligned(32)))
-static PixelRGB888 frame_buffer[LCD_WIDTH * LCD_HEIGHT];
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MPU_Config(void);
 /* USER CODE BEGIN PFP */
-static void EarlyDiagInit(void);
-static void Display_Reset(void);
-static void Display_Backlight_On(void);
-static void DrawColorBars(void);
-static void FlushFrameBuffer(void);
 extern "C" void DebugProbe_AppEntry(void);
-extern "C" void DebugProbe_PreTouchGFXInit(void);
-extern "C" void DebugProbe_PostTouchGFXInit(void);
-extern "C" void DebugProbe_MainLoop(void);
-static HAL_StatusTypeDef UartLog(const char *format, ...);
-static HAL_StatusTypeDef SDRAM_SelfTest(void);
-static void LogLTDCState(void);
-static void FatalBlinkLoop(uint16_t delay_ms);
 
 /* USER CODE END PFP */
 
@@ -144,8 +111,8 @@ int main(void)
 
    /* USER CODE BEGIN SysInit */
    DebugProbe_AppEntry();
-   EarlyDiagInit();
-   UartLog("boot: clock configured, entering peripheral init\r\n");
+   CoffeeMachine_EarlyDiagInit();
+   AppDebugLog("boot: clock configured, entering peripheral init\r\n");
 
    /* USER CODE END SysInit */
 
@@ -157,41 +124,12 @@ int main(void)
    MX_DMA2D_Init();
    MX_CRC_Init();
    /* USER CODE BEGIN 2 */
-   /* QSPI is already configured for XIP by extmem_boot before jumping here. */
-   HAL_GPIO_WritePin(LCD_DISPD7_GPIO_Port, LCD_DISPD7_Pin, GPIO_PIN_SET);
-
-   UartLog("coffee_machine display bootstrap\r\n");
-
-   if (SDRAM_SelfTest() != HAL_OK)
+   if (CoffeeMachine_DisplayBootstrap() != HAL_OK)
    {
-      UartLog("SDRAM self-test failed\r\n");
-      FatalBlinkLoop(100U);
+      CoffeeMachine_FatalBlinkLoop(100U);
    }
 
-   if (HAL_LTDC_SetAddress(&hltdc, LCD_FRAMEBUFFER_ADDR, 0) != HAL_OK)
-   {
-      UartLog("LTDC layer0 address update failed\r\n");
-      FatalBlinkLoop(200U);
-   }
-
-   DrawColorBars();
-   FlushFrameBuffer();
-   LogLTDCState();
-   Display_Reset();
-   Display_Backlight_On();
-
-   UartLog("SDRAM self-test passed\r\n");
-   UartLog("display enabled\r\n");
-
-#if SHOW_BRINGUP_TEST_PATTERN
-   UartLog("holding test pattern for %lu ms\r\n", TEST_PATTERN_HOLD_MS);
-   HAL_Delay(TEST_PATTERN_HOLD_MS);
-#else
-   UartLog("skipping test pattern hold, starting TouchGFX\r\n");
-#endif
-
-   MX_TouchGFX_Init();
-   UartLog("touchgfx initialized\r\n");
+   CoffeeMachine_AppStart();
 
    /* USER CODE END 2 */
 
@@ -201,7 +139,7 @@ int main(void)
    {
       /* USER CODE END WHILE */
 
-      MX_TouchGFX_Process();
+      CoffeeMachine_AppProcess();
       /* USER CODE BEGIN 3 */
    }
    /* USER CODE END 3 */
@@ -266,164 +204,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-static void EarlyDiagInit(void)
-{
-   MX_USART3_UART_Init();
-}
-
-static void Display_Reset(void)
-{
-   HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_RESET);
-   HAL_Delay(20);
-   HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET);
-   HAL_Delay(120);
-}
-
-static void Display_Backlight_On(void)
-{
-   HAL_GPIO_WritePin(LCD_BL_GPIO_Port, LCD_BL_Pin, GPIO_PIN_SET);
-}
-
-static void DrawColorBars(void)
-{
-   static const PixelRGB888 colors[3] = {
-      { 0x00U, 0x00U, 0xFFU },
-      /* Red */
-      { 0x00U, 0xFFU, 0x00U },
-      /* Green */
-      { 0xFFU, 0x00U, 0x00U }  /* Blue */
-   };
-   uint32_t x = 0;
-   uint32_t y = 0;
-   const uint32_t bar_width = LCD_WIDTH / 3U;
-
-   for (y = 0; y < LCD_HEIGHT; ++y)
-   {
-      for (x = 0; x < LCD_WIDTH; ++x)
-      {
-         uint32_t bar = x / bar_width;
-         if (bar > 2U)
-         {
-            bar = 2U;
-         }
-         frame_buffer[(y * LCD_WIDTH) + x] = colors[bar];
-      }
-   }
-}
-
-static void FlushFrameBuffer(void)
-{
-   SCB_CleanDCache();
-   __DSB();
-   __ISB();
-}
-
-static HAL_StatusTypeDef UartLog(const char *format, ...)
-{
-   char buffer[160];
-   va_list args;
-   int length = 0;
-
-   va_start(args, format);
-   length = vsnprintf(buffer, sizeof(buffer), format, args);
-   va_end(args);
-
-   if (length < 0)
-   {
-      return HAL_ERROR;
-   }
-
-   if ((size_t)length >= sizeof(buffer))
-   {
-      length = (int)(sizeof(buffer) - 1U);
-   }
-
-   return HAL_UART_Transmit(&huart3, (uint8_t *)buffer, (uint16_t)length, 1000U);
-}
-
-extern "C" HAL_StatusTypeDef AppDebugLog(const char *format, ...)
-{
-   char buffer[160];
-   va_list args;
-   int length = 0;
-
-   va_start(args, format);
-   length = vsnprintf(buffer, sizeof(buffer), format, args);
-   va_end(args);
-
-   if (length < 0)
-   {
-      return HAL_ERROR;
-   }
-
-   if ((size_t)length >= sizeof(buffer))
-   {
-      length = (int)(sizeof(buffer) - 1U);
-   }
-
-   return HAL_UART_Transmit(&huart3, (uint8_t *)buffer, (uint16_t)length, 1000U);
-}
-
-static HAL_StatusTypeDef SDRAM_SelfTest(void)
-{
-   volatile uint32_t *const sdram = (uint32_t *)LCD_FRAMEBUFFER_ADDR;
-   static const uint32_t patterns[] = {
-      0x00000000U,
-      0xFFFFFFFFU,
-      0x55555555U,
-      0xAAAAAAAAU,
-      0x12345678U,
-      0x89ABCDEFU
-   };
-   size_t index = 0;
-
-   for (index = 0; index < (sizeof(patterns) / sizeof(patterns[0])); ++index)
-   {
-      sdram[index] = patterns[index];
-   }
-
-   SCB_CleanDCache_by_Addr((uint32_t *)sdram, 32);
-   SCB_InvalidateDCache_by_Addr((uint32_t *)sdram, 32);
-
-   for (index = 0; index < (sizeof(patterns) / sizeof(patterns[0])); ++index)
-   {
-      if (sdram[index] != patterns[index])
-      {
-         UartLog("SDRAM mismatch @%p wrote=0x%08lX read=0x%08lX\r\n",
-            &sdram[index],
-            patterns[index],
-            sdram[index]);
-         return HAL_ERROR;
-      }
-   }
-
-   return HAL_OK;
-}
-
-static void LogLTDCState(void)
-{
-   UartLog("LTDC SSCR=0x%08lX BPCR=0x%08lX AWCR=0x%08lX TWCR=0x%08lX GCR=0x%08lX\r\n",
-      LTDC->SSCR,
-      LTDC->BPCR,
-      LTDC->AWCR,
-      LTDC->TWCR,
-      LTDC->GCR);
-   UartLog("LTDC L1 CFBAR=0x%08lX CFBLR=0x%08lX CFBLNR=0x%08lX CR=0x%08lX\r\n",
-      LTDC_Layer1->CFBAR,
-      LTDC_Layer1->CFBLR,
-      LTDC_Layer1->CFBLNR,
-      LTDC_Layer1->CR);
-}
-
-static void FatalBlinkLoop(uint16_t delay_ms)
-{
-   while (1)
-   {
-      HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
-      HAL_Delay(delay_ms);
-   }
-}
-
 /* USER CODE END 4 */
 
  /* MPU Configuration */
@@ -507,12 +287,8 @@ void Error_Handler(void)
    /* USER CODE BEGIN Error_Handler_Debug */
       /* User can add his own implementation to report the HAL error return state */
    __disable_irq();
-   UartLog("Error_Handler reached\r\n");
-   while (1)
-   {
-      HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
-      HAL_Delay(150U);
-   }
+   AppDebugLog("Error_Handler reached\r\n");
+   CoffeeMachine_FatalBlinkLoop(150U);
    /* USER CODE END Error_Handler_Debug */
 }
 

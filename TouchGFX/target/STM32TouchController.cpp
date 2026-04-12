@@ -33,11 +33,11 @@ extern "C"
 
 namespace
 {
-bool g_touchInitialized = false;
-bool g_touchInitLogged = false;
-bool g_touchWasDown = false;
-int32_t g_lastLoggedX = -1;
-int32_t g_lastLoggedY = -1;
+bool g_touchInitialized = false; ///< True after BSP touch initialization completed successfully.
+bool g_touchInitLogged = false;  ///< Guards the one-time touch init log line.
+bool g_touchWasDown = false;     ///< Tracks touch-down state for motion logging.
+int32_t g_lastLoggedX = -1;      ///< Last logged X coordinate.
+int32_t g_lastLoggedY = -1;      ///< Last logged Y coordinate.
 }
 
 void STM32TouchController::init()

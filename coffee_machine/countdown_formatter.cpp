@@ -1,3 +1,8 @@
+/**
+ * @file countdown_formatter.cpp
+ * @brief Formatting helper for brewing countdown values.
+ */
+
 #include "countdown_formatter.hpp"
 
 #include <cstdio>

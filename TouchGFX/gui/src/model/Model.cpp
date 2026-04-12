@@ -24,22 +24,6 @@ uint32_t get_app_tick_ms()
 #endif
 }
 
-const char* coffeeTypeToName(CoffeeType type)
-{
-    switch (type)
-    {
-    case CoffeeType::Espresso:
-        return "espresso";
-    case CoffeeType::Cappuccino:
-        return "cappuccino";
-    case CoffeeType::Latte:
-        return "latte";
-    case CoffeeType::Americano:
-        return "americano";
-    default:
-        return "unknown";
-    }
-}
 }
 
 Model::Model()
@@ -58,9 +42,9 @@ void Model::startBrewing(CoffeeType type)
     done_hold_ms_ = 0U;
     completion_notified_ = false;
 #ifdef SIMULATOR
-    std::printf("TouchGFX event: %s selected\r\n", coffeeTypeToName(type));
+    std::printf("TouchGFX event: %s selected\r\n", CoffeeMachine_GetCoffeeLogName(type));
 #else
-    AppDebugLog("TouchGFX event: %s selected\r\n", coffeeTypeToName(type));
+    AppDebugLog("TouchGFX event: %s selected\r\n", CoffeeMachine_GetCoffeeLogName(type));
 #endif
     notifyBrewingSessionUpdated();
 }

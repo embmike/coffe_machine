@@ -9,40 +9,6 @@
 
 namespace
 {
-const char* getCoffeeName(CoffeeType type)
-{
-    switch (type)
-    {
-    case CoffeeType::Espresso:
-        return "Espresso";
-    case CoffeeType::Cappuccino:
-        return "Cappuccino";
-    case CoffeeType::Latte:
-        return "Latte";
-    case CoffeeType::Americano:
-        return "Americano";
-    default:
-        return "";
-    }
-}
-
-const char* getCoffeeCharacter(CoffeeType type)
-{
-    switch (type)
-    {
-    case CoffeeType::Espresso:
-        return "strong & intense";
-    case CoffeeType::Cappuccino:
-        return "creamy & smooth";
-    case CoffeeType::Latte:
-        return "mild & silky";
-    case CoffeeType::Americano:
-        return "clean & aromatic";
-    default:
-        return "";
-    }
-}
-
 touchgfx::BitmapId getHeroBitmapId(CoffeeType)
 {
     return BITMAP_POURING_FRAME_10_180_120_ID;
@@ -184,10 +150,10 @@ void brewing_screenView::updateTexts(const BrewingSession& session)
     char countdown_ascii[8] = { 0 };
 
     touchgfx::Unicode::strncpy(coffeeNameBuffer,
-        getCoffeeName(session.coffee_type),
+        CoffeeMachine_GetCoffeeName(session.coffee_type),
         static_cast<uint16_t>(sizeof(coffeeNameBuffer) / sizeof(coffeeNameBuffer[0])));
     touchgfx::Unicode::strncpy(coffeeCharacterBuffer,
-        getCoffeeCharacter(session.coffee_type),
+        CoffeeMachine_GetCoffeeCharacter(session.coffee_type),
         static_cast<uint16_t>(sizeof(coffeeCharacterBuffer) / sizeof(coffeeCharacterBuffer[0])));
 
     format_countdown(session.remaining_time_ms, countdown_ascii, sizeof(countdown_ascii));
