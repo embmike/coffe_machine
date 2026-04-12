@@ -27,6 +27,14 @@ Start here:
 - [Artifacts](./docs/05-artifacts/README.md)
 - [TouchGFX](./docs/06-touchgfx/README.md)
 
+The developer documentation is organized around practical workflows:
+
+- architecture and ownership of the runtime pieces
+- build and flash entry points
+- debug workflows in Visual Studio / VisualGDB
+- driver chapters for QSPI, SDRAM, display, touch, and UART
+- generated and developer-facing artifacts
+
 ## Quick Start
 
 ## For Bootloader Work
@@ -100,7 +108,8 @@ flowchart TD
     D --> E["coffee_machine"]
     E --> F["Framebuffer in SDRAM"]
     E --> G["Display bring-up and UI"]
-    E --> H["UART diagnostics"]
+    E --> H["Touch input through FT5336 / I2C4"]
+    E --> I["UART diagnostics"]
 ```
 
 ## Developer Reading Order

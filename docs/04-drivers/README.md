@@ -12,11 +12,12 @@ This chapter is the map. The individual driver chapters contain the deeper imple
 
 ## Driver Areas
 
-The project currently depends on four driver areas for basic bring-up:
+The project currently depends on five driver areas for basic bring-up and UI interaction:
 
 - QSPI / External Flash / XIP
 - FMC / SDRAM
 - LTDC / Display
+- Touch / Input
 - UART / Debug Output
 
 They do not operate independently. They form a startup chain.
@@ -32,6 +33,9 @@ flowchart TD
     E --> F["LTDC can read visible pixel data"]
     B --> G["Application executes from external flash"]
     G --> H["UART early diagnostics"]
+    G --> I["TouchGFX starts"]
+    I --> J["Touch driver samples FT5336 over I2C4"]
+    J --> K["TouchGFX events reach screens and model"]
     G --> D
     H --> D
     H --> F
@@ -42,6 +46,7 @@ The important point is:
 - the app can only execute because QSPI/XIP works
 - the display can only work because SDRAM works
 - LTDC can only show correct output if both SDRAM and framebuffer/cache behavior are correct
+- touch input can only work because the BSP FT5336 path and `I2C4` path are valid
 - UART helps explain where the system stopped before the display path is trustworthy
 
 ## Subsystem Responsibilities
@@ -104,6 +109,26 @@ Detailed chapter:
 
 - [LTDC / Display](./ltdc-display.md)
 
+## Touch / Input
+
+This subsystem is responsible for:
+
+- configuring the FT5336 touch controller through the BSP
+- sampling touch coordinates over `I2C4`
+- mapping those coordinates into the active `480 x 272` TouchGFX screen
+- delivering press events to buttons and screens
+
+Read this chapter first when the symptom is:
+
+- the display is visible but touch does not react
+- touches are reported at the wrong coordinates
+- TouchGFX screens render correctly but button callbacks do not fire
+- you need to understand where the FT5336, BSP, and TouchGFX adapter meet
+
+Detailed chapter:
+
+- [Touch / Input](./touch-input.md)
+
 ## UART / Debug Output
 
 This subsystem is responsible for:
@@ -131,7 +156,8 @@ For a developer who is new to this codebase, the most useful order is:
 2. [QSPI / External Flash / XIP](C:/st_apps/coffee_machine/docs/04-drivers/qspi-xip.md)
 3. [FMC / SDRAM](C:/st_apps/coffee_machine/docs/04-drivers/fmc-sdram.md)
 4. [LTDC / Display](C:/st_apps/coffee_machine/docs/04-drivers/ltdc-display.md)
-5. [UART / Debug Output](C:/st_apps/coffee_machine/docs/04-drivers/uart-debug.md)
+5. [Touch / Input](C:/st_apps/coffee_machine/docs/04-drivers/touch-input.md)
+6. [UART / Debug Output](C:/st_apps/coffee_machine/docs/04-drivers/uart-debug.md)
 
 Why this order:
 
@@ -139,6 +165,7 @@ Why this order:
 - then understand how the app becomes executable
 - then understand how framebuffer memory becomes valid
 - then understand how the visible display path uses that memory
+- then understand how user input returns from the panel into TouchGFX
 - finally understand how UART helps diagnose everything else
 
 ## Symptom-To-Chapter Guide
@@ -156,6 +183,10 @@ Why this order:
 - **The display is black but UART logs continue**
   - start with [ltdc-display.md](C:/st_apps/coffee_machine/docs/04-drivers/ltdc-display.md)
   - then [fmc-sdram.md](C:/st_apps/coffee_machine/docs/04-drivers/fmc-sdram.md)
+
+- **The display works but buttons do not react**
+  - start with [touch-input.md](C:/st_apps/coffee_machine/docs/04-drivers/touch-input.md)
+  - then [ltdc-display.md](C:/st_apps/coffee_machine/docs/04-drivers/ltdc-display.md)
 
 - **There are no useful logs**
   - start with [uart-debug.md](C:/st_apps/coffee_machine/docs/04-drivers/uart-debug.md)

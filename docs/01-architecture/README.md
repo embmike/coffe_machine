@@ -15,6 +15,32 @@ The framebuffer is placed in external SDRAM.
 
 This split was chosen because the STM32H750 device has limited internal flash, while the application, generated UI assets, and TouchGFX-related code are much larger than what should comfortably live in internal flash.
 
+## Developer Structure
+
+The runtime architecture explains where code executes.
+
+The structure below explains where responsibilities live in the repository.
+
+```mermaid
+flowchart TD
+    A["extmem_bootloader<br/>internal-flash boot stage"] --> B["coffee_machine<br/>XIP application"]
+    B --> C["Core<br/>CubeMX startup, HAL init, MPU, clocks"]
+    B --> D["coffee_machine/<br/>app facade, board bootstrap, domain logic"]
+    B --> E["TouchGFX<br/>generated UI + user screens + model/presenter"]
+    C --> F["Drivers/BSP<br/>QSPI, SDRAM, LTDC, TS, FT5336"]
+    D --> F
+    E --> F
+    F --> G["STM32H750B-DK hardware<br/>QSPI, SDRAM, LTDC, I2C4, UART"]
+```
+
+Practical ownership model:
+
+- `ExtMem_Boot` owns reset-to-app hand-off
+- `Core` owns generated MCU setup and HAL-level peripheral initialization
+- `coffee_machine` owns handwritten app/bootstrap/domain code
+- `TouchGFX` owns the UI structure
+- `Drivers/BSP` owns the board- and component-level hardware adapters
+
 ## Boot Paths
 
 ### Normal runtime path
@@ -121,14 +147,14 @@ During stabilization, several early application-side behaviors had to be adjuste
 
 Those fixes were necessary to move from:
 
-- “boots sometimes / faults early”
+- "boots sometimes / faults early"
 
 to:
 
-- “bootloader starts”
-- “jump works”
-- “application runs”
-- “test pattern and UART diagnostics work”
+- "bootloader starts"
+- "jump works"
+- "application runs"
+- "test pattern and UART diagnostics work"
 
 ## Bootloader Hand-off Details
 
@@ -171,13 +197,23 @@ These files are central to understanding the final architecture:
 - [ExtMem_Boot/Src/main.c](C:/st_apps/coffee_machine/ExtMem_Boot/Src/main.c)
   - bootloader startup and jump-to-application logic
 - [Core/Src/main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp)
-  - application entry path, diagnostics, test pattern, and current TouchGFX integration point
+  - application entry path and startup orchestration
+- [coffee_machine/coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp)
+  - board bootstrap, LTDC test pattern, SDRAM validation, UART logging, fatal handling
+- [coffee_machine/coffee_machine_app.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.cpp)
+  - application-side TouchGFX startup and processing facade
+- [coffee_machine/coffee_machine_simulation.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_simulation.cpp)
+  - brewing-domain state machine behind the demonstrator flow
 - [Core/Src/fmc.c](C:/st_apps/coffee_machine/Core/Src/fmc.c)
   - application-side SDRAM initialization
 - [Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_qspi.c](C:/st_apps/coffee_machine/Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_qspi.c)
   - board-level QSPI support
 - [Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_sdram.c](C:/st_apps/coffee_machine/Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_sdram.c)
   - board-level SDRAM support
+- [Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_ts.c](C:/st_apps/coffee_machine/Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_ts.c)
+  - board-level FT5336 touch support
+- [TouchGFX/target/STM32TouchController.cpp](C:/st_apps/coffee_machine/TouchGFX/target/STM32TouchController.cpp)
+  - TouchGFX adapter that samples touch coordinates from the BSP
 - [tools/visualgdb/README.md](C:/st_apps/coffee_machine/tools/visualgdb/README.md)
   - switchable VisualGDB profile templates used for project debug workflows
 

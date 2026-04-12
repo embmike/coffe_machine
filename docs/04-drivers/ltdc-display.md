@@ -13,6 +13,7 @@ In this project, LTDC is responsible for:
 - driving the 480x272 panel timing
 - reading the framebuffer from SDRAM
 - presenting the early test pattern before TouchGFX is enabled
+- providing the visible output path that TouchGFX later renders into
 
 This makes LTDC the visible end of a larger chain:
 
@@ -30,6 +31,8 @@ Primary files:
 
 - [Core/Src/ltdc.c](C:/st_apps/coffee_machine/Core/Src/ltdc.c)
 - [Core/Src/main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp)
+- [coffee_machine/coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp)
+- [coffee_machine/coffee_machine_app.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.cpp)
 - [Core/Src/gpio.c](C:/st_apps/coffee_machine/Core/Src/gpio.c)
 - [Core/Inc/main.h](C:/st_apps/coffee_machine/Core/Inc/main.h)
 
@@ -44,7 +47,7 @@ The LTDC initialization is implemented in [ltdc.c](C:/st_apps/coffee_machine/Cor
 Important settings in `MX_LTDC_Init()`:
 
 - panel size: `480 x 272`
-- pixel format: `LTDC_PIXEL_FORMAT_RGB565`
+- pixel format: `LTDC_PIXEL_FORMAT_RGB888`
 - layer 0 window: full screen
 - initial layer framebuffer address: `3489660928`
 
@@ -77,28 +80,33 @@ Those pins are initialized in:
 
 - [Core/Src/gpio.c](C:/st_apps/coffee_machine/Core/Src/gpio.c)
 
-The app then uses:
+The app then uses board-level helper functions for:
 
-- `Display_Reset()`
-- `Display_Backlight_On()`
+- panel reset
+- backlight enable
 
-from [main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp).
+from [coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp).
 
 ## Display bring-up sequence in the app
 
-The visible display path is assembled in [main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp).
+The visible display path is assembled by the startup and board facades:
+
+- [Core/Src/main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp)
+- [coffee_machine/coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp)
+- [coffee_machine/coffee_machine_app.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.cpp)
 
 Current flow:
 
 1. `MX_FMC_Init()`
 2. `MX_LTDC_Init()`
-3. validate SDRAM with `SDRAM_SelfTest()`
+3. validate SDRAM inside `CoffeeMachine_DisplayBootstrap()`
 4. call `HAL_LTDC_SetAddress(&hltdc, LCD_FRAMEBUFFER_ADDR, 0)`
 5. draw color bars into the framebuffer
-6. flush cache with `FlushFrameBuffer()`
-7. log LTDC register state with `LogLTDCState()`
-8. toggle panel reset with `Display_Reset()`
-9. enable backlight with `Display_Backlight_On()`
+6. flush cache
+7. log LTDC register state
+8. toggle panel reset
+9. enable backlight
+10. start TouchGFX through `CoffeeMachine_AppStart()`
 
 That sequence is deliberate. It separates:
 
@@ -108,15 +116,15 @@ That sequence is deliberate. It separates:
 
 ## Framebuffer update model
 
-The framebuffer is declared in [main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp) and tied to:
+The bring-up framebuffer is declared in [coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp) and tied to:
 
 - `LCD_FRAMEBUFFER_ADDR = 0xD0000000`
 
-The test pattern is created by `DrawColorBars()` and then committed for LTDC consumption by:
+The test pattern is created by the internal helper `drawColorBars()` and then committed for LTDC consumption by:
 
-- `FlushFrameBuffer()`
+- `flushFrameBuffer()`
 
-`FlushFrameBuffer()` currently uses:
+`flushFrameBuffer()` currently uses:
 
 - `SCB_CleanDCache()`
 - `__DSB()`
@@ -126,9 +134,9 @@ That cache maintenance is important because LTDC is a bus master reading memory 
 
 ## LTDC diagnostics
 
-The project includes an explicit LTDC logging helper:
+The project includes an explicit LTDC logging helper inside the board facade:
 
-- `LogLTDCState()`
+- `logLtdcState()`
 
 It prints:
 
@@ -180,10 +188,12 @@ Even with valid LTDC timing and valid framebuffer memory, the display can still 
 
 That is why the app explicitly performs:
 
-- `Display_Reset()`
-- `Display_Backlight_On()`
+- panel reset
+- backlight enable
 
 after the framebuffer and LTDC setup have already been validated.
+
+In the current codebase those actions are encapsulated in the board-level bootstrap helper instead of being spread directly across `main.cpp`.
 
 ### 4. Cache maintenance is part of the display path
 
@@ -198,19 +208,37 @@ If a developer changes:
 
 they must revisit the cache-maintenance assumptions too.
 
+## Relationship To Touch / Input
+
+LTDC and touch input are not the same subsystem.
+
+They meet at the UI layer:
+
+- LTDC shows the current framebuffer
+- the FT5336 touch path reports user input
+- TouchGFX uses both to create the interactive screen model
+
+That means a visible screen does not prove the touch path is correct, and a working touch sample does not prove LTDC is configured correctly.
+
+For the touch side, see:
+
+- [Touch / Input](./touch-input.md)
+
 ## Display Bring-Up Flow
 
 ```mermaid
 flowchart TD
     A["MX_FMC_Init()"] --> B["MX_LTDC_Init()"]
-    B --> C["SDRAM_SelfTest()"]
+    B --> C["CoffeeMachine_DisplayBootstrap()"]
     C --> D["HAL_LTDC_SetAddress(0xD0000000)"]
-    D --> E["DrawColorBars()"]
-    E --> F["FlushFrameBuffer()"]
-    F --> G["LogLTDCState()"]
-    G --> H["Display_Reset()"]
-    H --> I["Display_Backlight_On()"]
+    D --> E["drawColorBars()"]
+    E --> F["flushFrameBuffer()"]
+    F --> G["logLtdcState()"]
+    G --> H["panel reset"]
+    H --> I["backlight on"]
     I --> J["Visible test pattern"]
+    J --> K["CoffeeMachine_AppStart()"]
+    K --> L["TouchGFX renders into SDRAM framebuffer"]
 ```
 
 ## What To Preserve
@@ -229,11 +257,13 @@ For a developer who needs to understand this area, start here:
 
 - [Core/Src/ltdc.c](C:/st_apps/coffee_machine/Core/Src/ltdc.c)
 - [Core/Src/main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp)
+- [coffee_machine/coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp)
+- [coffee_machine/coffee_machine_app.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.cpp)
 - [Core/Src/gpio.c](C:/st_apps/coffee_machine/Core/Src/gpio.c)
 - [Core/Inc/main.h](C:/st_apps/coffee_machine/Core/Inc/main.h)
 - [docs/04-drivers/fmc-sdram.md](C:/st_apps/coffee_machine/docs/04-drivers/fmc-sdram.md)
+- [docs/04-drivers/touch-input.md](C:/st_apps/coffee_machine/docs/04-drivers/touch-input.md)
 
 ## ST References
 
 - [UM2488 - Discovery kit with STM32H750XB microcontroller](https://www.st.com/resource/en/user_manual/um2488-discovery-kits-with-stm32h745xi-and-stm32h750xb-microcontrollers-stmicroelectronics.pdf)
-

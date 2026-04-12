@@ -44,12 +44,13 @@ Primary files:
 
 - [Core/Src/fmc.c](C:/st_apps/coffee_machine/Core/Src/fmc.c)
 - [Core/Src/main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp)
+- [coffee_machine/coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp)
 
 ## How It Works
 
 ## Framebuffer model
 
-The framebuffer used by the test-pattern path is declared in [main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp) and placed in the `.framebuffer` section.
+The framebuffer used by the test-pattern path is declared in [coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp) and placed in the `.framebuffer` section.
 
 Relevant constants:
 
@@ -59,7 +60,7 @@ Relevant constants:
 
 The application then:
 
-- validates SDRAM with `SDRAM_SelfTest()`
+- validates SDRAM inside `CoffeeMachine_DisplayBootstrap()`
 - points LTDC layer 1 at `LCD_FRAMEBUFFER_ADDR`
 - draws color bars
 - flushes cache lines
@@ -115,9 +116,9 @@ That is one of the reasons the bootloader exists in the architecture at all: it 
 
 ## Validation path in the application
 
-The app validates SDRAM explicitly in [main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp):
+The app validates SDRAM explicitly in [coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp):
 
-- `SDRAM_SelfTest()` writes several 32-bit patterns to SDRAM
+- `sdramSelfTest()` writes several 32-bit patterns to SDRAM
 - cache is cleaned/invalidated for the tested area
 - the patterns are read back and compared
 - the app refuses to continue into the normal display path if the test fails
@@ -129,7 +130,7 @@ flowchart TD
     A["MX_FMC_Init()"] --> B["HAL_SDRAM_Init()"]
     B --> C["Disable speculative FMC Bank1 path"]
     C --> D["MT48LC4M32B2_Init()"]
-    D --> E["SDRAM_SelfTest()"]
+    D --> E["sdramSelfTest()"]
     E --> F["HAL_LTDC_SetAddress(0xD0000000)"]
     F --> G["Draw test pattern"]
 ```
@@ -193,6 +194,7 @@ For a developer who needs to understand this area, read these files first:
 
 - [Core/Src/fmc.c](C:/st_apps/coffee_machine/Core/Src/fmc.c)
 - [Core/Src/main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp)
+- [coffee_machine/coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp)
 - [ExtMem_Boot/Src/fmc.c](C:/st_apps/coffee_machine/ExtMem_Boot/Src/fmc.c)
 - [Core/Src/system_stm32h7xx.c](C:/st_apps/coffee_machine/Core/Src/system_stm32h7xx.c)
 - [Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_sdram.c](C:/st_apps/coffee_machine/Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_sdram.c)

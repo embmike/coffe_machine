@@ -152,7 +152,7 @@ Why these mattered:
 Typical validated breakpoint locations:
 
 - [main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp) in `main()`
-- [main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp) in `DebugProbe_*()` helper functions
+- [main.cpp](C:/st_apps/coffee_machine/Core/Src/main.cpp) in `DebugProbe_AppEntry()`
 
 ### Release Image Debugging
 
