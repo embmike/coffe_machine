@@ -4,7 +4,7 @@
 
 TBD.
 
-## 3) 3) Architecture overview for the developer
+## 3) Architecture overview for the developer
 
 This project is built around a two-stage runtime:
 
