@@ -6,19 +6,19 @@ TBD.
 
 ## Splash screen
 
-<img src="./images/blob/main/brewing_screen.jpeg)" alt="Splash screen screenshot" width="30%" />
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/brewing_screen.jpeg" alt="Splash screen screenshot" width="30%" />
 
 ## Selection screen
 
-<img src="./images/blob/main/selection_screen.jpeg)" alt="Selection screen screenshot" width="30%" />
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/selection_screen.jpeg" alt="Selection screen screenshot" width="30%" />
 
 ## Choose a coffee on Selection screen
 
-<img src="./images/blob/main/choose_a_coffee.jpeg)" alt="Choose a coffee screen screenshot" width="30%" />
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/choose_a_coffee.jpeg" alt="Choose a coffee screen screenshot" width="30%" />
 
 ## Brewing screen
 
-<img src="./images/blob/main/brewing_screen.jpeg.jpeg)" alt="Brewing screen screenshot" width="30%" />
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/brewing_screen.jpeg" alt="Brewing screen screenshot" width="30%" />
 
 
 ## 3) Architecture overview for the developer
