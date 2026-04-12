@@ -93,4 +93,4 @@ CMakeLists.txt.user*
 /TouchGFX/build/
 /TouchGFX/config/
 /TouchGFX/generated/
-/Assets/
+# /Assets/
