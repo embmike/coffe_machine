@@ -139,6 +139,6 @@ Internal helper artifacts are documented here:
 
 - [Artifacts](./docs/05-artifacts/README.md)
 
-## Licence
+## License
 
 This project is licensed under the terms of the [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
