@@ -69,6 +69,31 @@ The main developer-facing entry points are:
   - `flash_app`
   - `flash_system`
 
+## 3) Development Environment
+
+The validated development setup for this repository is currently:
+
+- Microsoft Visual Studio 2022
+- VisualGDB
+- GNU Arm Embedded Toolchain (`arm-none-eabi-gcc`, `arm-none-eabi-g++`)
+- STM32CubeMX
+- TouchGFX Designer
+- STM32CubeProgrammer
+
+In practice this means:
+
+- project generation and MCU configuration are maintained through STM32CubeMX
+- application and bootloader builds are driven through CMake / Ninja in VisualGDB
+- board flashing can happen through the VisualGDB flash targets or STM32CubeProgrammer
+- TouchGFX screens and generated GUI code are maintained through TouchGFX Designer
+
+If a different host setup is used, the most likely places that need attention are:
+
+- VisualGDB project settings
+- debugger startup commands
+- external tool paths
+- generated simulator/build integration
+
 ### Bootloader work
 
 Use this path when you are changing or debugging:
@@ -136,7 +161,7 @@ Detailed guide:
 
 - [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)
 
-## 3) Architecture Overview
+## 4) Architecture Overview
 
 This project is built around a two-stage runtime:
 
@@ -169,7 +194,7 @@ Read the full architecture chapter here:
 
 - [docs/01-architecture/README.md](./docs/01-architecture/README.md)
 
-## 4) Documentation Map
+## 5) Documentation Map
 
 The developer documentation is split by responsibility and workflow:
 
@@ -194,7 +219,48 @@ The developer documentation is split by responsibility and workflow:
 - [docs/04-drivers/touch-input.md](./docs/04-drivers/touch-input.md)
 - [docs/04-drivers/uart-debug.md](./docs/04-drivers/uart-debug.md)
 
-## 5) File Responsibilities
+## 6) Path Notes
+
+Some files in this repository still contain absolute Windows paths.
+
+There are two different cases:
+
+### 1. Documentation convenience paths
+
+Many documentation chapters use absolute file links like:
+
+- `C:/st_apps/coffee_machine/...`
+
+These are primarily there so local file references are clickable in the current workflow and tool environment.
+
+They are not runtime-critical, but they do assume the repository lives at:
+
+- `C:/st_apps/coffee_machine`
+
+### 2. Real machine-specific path dependencies
+
+The following files contain absolute paths that are part of the current debug workflow and may need adjustment on another machine:
+
+- [CMakeLists.txt](./CMakeLists.txt)
+- [coffee_machine.vgdbcmake](./coffee_machine.vgdbcmake)
+- [tools/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake](./tools/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+- [tools/visualgdb/coffee_machine.bootloader_debug.vgdbcmake](./tools/visualgdb/coffee_machine.bootloader_debug.vgdbcmake)
+
+These path-dependent entries are used for things like:
+
+- external tool discovery
+- debugger symbol loading
+- VisualGDB startup commands
+- boot-to-app debug support
+
+If the repository is moved to a different local path, these files should be checked first.
+
+Practical note:
+
+- `CMakeLists.txt` contains Windows default search paths for `STM32_Programmer_CLI`
+- the `.vgdbcmake` files contain debugger startup commands with absolute local build paths
+
+## 7) File Responsibilities
 
 | File | Responsibility |
 |---|---|
@@ -210,7 +276,7 @@ The developer documentation is split by responsibility and workflow:
 | `Drivers/BSP/STM32H750B-DK/...` | Board-level QSPI, SDRAM, LTDC, and touch support. |
 | `tools/visualgdb/...` | VisualGDB profile support files for validated debug workflows. |
 
-## 6) Recommended Reading Order
+## 8) Recommended Reading Order
 
 If you are new to the project, this reading order works well:
 
