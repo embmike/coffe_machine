@@ -4,7 +4,7 @@
 
 TBD.
 
-## Developer View
+## 3) 3) Architecture overview for the developer
 
 This project is built around a two-stage runtime:
 
@@ -138,3 +138,7 @@ Main flash targets:
 Internal helper artifacts are documented here:
 
 - [Artifacts](./docs/05-artifacts/README.md)
+
+## Licence
+
+This project is licensed under the terms of the [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
