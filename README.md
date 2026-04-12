@@ -1,113 +1,136 @@
 # Coffee Machine
 
+Coffee machine demonstrator for the **STM32H750B-DK** with:
+
+- internal bootloader in internal flash
+- XIP application in external QSPI flash
+- framebuffer in external SDRAM
+- TouchGFX user interface with touch input
+- UART-based developer diagnostics
+
 ## User View
 
 TBD.
 
+## Main Screens
+
 ## Splash screen
 
-<img src="https://github.com/embmike/coffe_machine/blob/main/Images/brewing_screen.jpeg" alt="Splash screen screenshot" width="30%" />
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/splash_screen.jpeg" alt="Splash screen screenshot" width="30%" />
 
 ## Selection screen
 
 <img src="https://github.com/embmike/coffe_machine/blob/main/Images/selection_screen.jpeg" alt="Selection screen screenshot" width="30%" />
 
-## Choose a coffee on Selection screen
-
-<img src="https://github.com/embmike/coffe_machine/blob/main/Images/choose_a_coffee.jpeg" alt="Choose a coffee screen screenshot" width="30%" />
-
 ## Brewing screen
 
 <img src="https://github.com/embmike/coffe_machine/blob/main/Images/brewing_screen.jpeg" alt="Brewing screen screenshot" width="30%" />
 
+## 1) What does the application do?
 
-## 3) Architecture overview for the developer
+The project is a demonstrator for a small embedded coffee machine UI on the **STM32H750B-DK**.
 
-This project is built around a two-stage runtime:
+At runtime it:
 
-- an internal bootloader initializes external memory
-- the main application then executes from external QSPI flash
+- boots through an internal bootloader
+- initializes external QSPI flash and SDRAM
+- jumps into the main application running from external flash
+- brings up LTDC, framebuffer, touch, and UART diagnostics
+- shows a TouchGFX-based coffee-machine flow
 
-That architecture affects:
+The current demonstrator flow is:
 
-- how the board boots
-- how software is programmed
-- how debugging works
-- why display and memory bring-up are staged
+1. splash screen
+2. automatic transition after `5 s`
+3. selection screen
+4. touch-based drink selection
+5. brewing screen with progress, countdown, pouring animation, and steam animation
+6. automatic return to the selection screen
 
-Start here:
+Current drink variants:
 
-- [Architecture](./docs/01-architecture/README.md)
-- [Build and Flash](./docs/02-build-and-flash/README.md)
-- [Debugging](./docs/03-debugging/README.md)
-- [Drivers](./docs/04-drivers/README.md)
-- [Artifacts](./docs/05-artifacts/README.md)
-- [TouchGFX](./docs/06-touchgfx/README.md)
+- Espresso
+- Cappuccino
+- Latte
+- Americano
 
-The developer documentation is organized around practical workflows:
+## 2) Developer Workflows
 
-- architecture and ownership of the runtime pieces
-- build and flash entry points
-- debug workflows in Visual Studio / VisualGDB
-- driver chapters for QSPI, SDRAM, display, touch, and UART
-- generated and developer-facing artifacts
+The project is organized around a few practical developer use cases:
 
-## Quick Start
+- debug the bootloader
+- debug the application
+- flash only the bootloader
+- flash only the application
+- flash the full validated software stack
+- continue TouchGFX work without breaking the board bring-up
 
-## For Bootloader Work
+The main developer-facing entry points are:
+
+- projects
+  - `extmem_bootloader`
+  - `coffee_machine`
+- flash targets
+  - `flash_bootloader`
+  - `flash_app`
+  - `flash_system`
+
+### Bootloader work
 
 Use this path when you are changing or debugging:
 
 - QSPI bring-up
 - SDRAM bring-up
 - jump-to-application behavior
-- bootloader startup faults
+- early startup faults before the app owns execution
 
-Steps:
+Typical flow:
 
-1. In Visual Studio, select the `Debug` build configuration.
+1. Select the `Debug` configuration in Visual Studio / VisualGDB.
 2. Build the project.
-3. Program the bootloader with `flash_bootloader` if needed.
+3. Run `flash_bootloader` if the bootloader image changed.
 4. Start debugging `extmem_bootloader`.
 5. Set breakpoints in bootloader source files through the IDE.
 
-Detailed guide:
+Detailed guides:
 
-- [Build and Flash](./docs/02-build-and-flash/README.md)
-- [Debugging](./docs/03-debugging/README.md)
+- [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)
+- [docs/03-debugging/README.md](./docs/03-debugging/README.md)
 
-## For Application Work
+### Application work
 
 Use this path when you are changing or debugging:
 
-- application startup
-- LTDC / display bring-up
+- application startup after the bootloader hand-off
+- LTDC / display logic
+- touch integration
 - UART diagnostics
-- TouchGFX integration
+- TouchGFX screens and model logic
 
-Steps:
+Typical flow:
 
-1. In Visual Studio, select the `Debug` build configuration.
+1. Select the `Debug` configuration.
 2. Build the project.
-3. Program the application with `flash_app`.
+3. Run `flash_app` if the application image changed.
 4. Start debugging `coffee_machine`.
-5. Follow the validated Boot-to-App debug sequence in the debugging chapter.
+5. Follow the validated application or boot-to-app debug path from the debugging chapter.
 
-Detailed guide:
+Detailed guides:
 
-- [Build and Flash](./docs/02-build-and-flash/README.md)
-- [Debugging](./docs/03-debugging/README.md)
+- [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)
+- [docs/03-debugging/README.md](./docs/03-debugging/README.md)
+- [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
 
-## For Full-System Programming
+### Full-system programming
 
-Use this path when you want the complete software state on the board.
+Use this path when you want the complete validated software state on the board.
 
-Steps:
+Typical flow:
 
 1. Select `Debug` or `Release`.
 2. Build the project.
 3. Run `flash_system`.
-4. Run the board standalone or start the matching debug path.
+4. Run the board standalone or continue with the matching debug workflow.
 
 Typical use cases:
 
@@ -115,7 +138,26 @@ Typical use cases:
 - prepare a known-good board state
 - create a release-style runtime image
 
-## Runtime Overview
+Detailed guide:
+
+- [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)
+
+## 3) Architecture Overview
+
+This project is built around a two-stage runtime:
+
+- an internal bootloader initializes external memory and performs the hand-off
+- the main application executes in place from external QSPI flash
+
+That architecture affects:
+
+- boot behavior
+- flash workflows
+- debugger setup
+- memory layout
+- display and touch bring-up
+
+Runtime overview:
 
 ```mermaid
 flowchart TD
@@ -124,37 +166,66 @@ flowchart TD
     C --> D["Jump to application at 0x90000000"]
     D --> E["coffee_machine"]
     E --> F["Framebuffer in SDRAM"]
-    E --> G["Display bring-up and UI"]
+    E --> G["TouchGFX UI"]
     E --> H["Touch input through FT5336 / I2C4"]
     E --> I["UART diagnostics"]
 ```
 
-## Developer Reading Order
+Read the full architecture chapter here:
 
-If you are new to the project, the recommended reading order is:
+- [docs/01-architecture/README.md](./docs/01-architecture/README.md)
 
-1. [Architecture](./docs/01-architecture/README.md)
-2. [Build and Flash](./docs/02-build-and-flash/README.md)
-3. [Debugging](./docs/03-debugging/README.md)
-4. [Drivers](./docs/04-drivers/README.md)
-5. [Artifacts](./docs/05-artifacts/README.md)
+## 4) Documentation Map
 
-## Project Outputs
+The developer documentation is split by responsibility and workflow:
 
-Main projects:
+- [docs/01-architecture/README.md](./docs/01-architecture/README.md)
+  - runtime structure, memory layout, boot path, hand-off design
+- [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)
+  - build targets, flash targets, Debug vs. Release usage
+- [docs/03-debugging/README.md](./docs/03-debugging/README.md)
+  - Visual Studio / VisualGDB workflows, application debug, boot-to-app debug
+- [docs/04-drivers/README.md](./docs/04-drivers/README.md)
+  - driver overview and links to detailed hardware chapters
+- [docs/05-artifacts/README.md](./docs/05-artifacts/README.md)
+  - developer-facing outputs and internal helper artifacts
+- [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
+  - TouchGFX flow, model/presenter ownership, simulation contract, UI assets
 
-- `coffee_machine`
-- `extmem_bootloader`
+### Driver chapters
 
-Main flash targets:
+- [docs/04-drivers/fmc-sdram.md](./docs/04-drivers/fmc-sdram.md)
+- [docs/04-drivers/qspi-xip.md](./docs/04-drivers/qspi-xip.md)
+- [docs/04-drivers/ltdc-display.md](./docs/04-drivers/ltdc-display.md)
+- [docs/04-drivers/touch-input.md](./docs/04-drivers/touch-input.md)
+- [docs/04-drivers/uart-debug.md](./docs/04-drivers/uart-debug.md)
 
-- `flash_app`
-- `flash_bootloader`
-- `flash_system`
+## 5) File Responsibilities
 
-Internal helper artifacts are documented here:
+| File | Responsibility |
+|---|---|
+| `CMakeLists.txt` | Top-level build structure, projects, flash targets, helper artifacts. |
+| `ExtMem_Boot/Src/main.c` | Bootloader startup and application hand-off. |
+| `Core/Src/main.cpp` | Application entry point and top-level startup orchestration. |
+| `coffee_machine/coffee_machine_app.hpp/.cpp` | Handwritten application facade around TouchGFX startup and processing. |
+| `coffee_machine/coffee_machine_board.hpp/.cpp` | Board bootstrap, LTDC test path, SDRAM validation, UART logging, fatal handling. |
+| `coffee_machine/coffee_machine_simulation.hpp/.cpp` | Handwritten brewing-domain simulation used by TouchGFX. |
+| `coffee_machine/countdown_formatter.hpp/.cpp` | Formatting helper for brewing countdown text. |
+| `TouchGFX/gui/src/...` | Handwritten TouchGFX views, presenters, model logic. |
+| `TouchGFX/generated/...` | Generated TouchGFX code; regenerate with care. |
+| `Drivers/BSP/STM32H750B-DK/...` | Board-level QSPI, SDRAM, LTDC, and touch support. |
+| `tools/visualgdb/...` | VisualGDB profile support files for validated debug workflows. |
 
-- [Artifacts](./docs/05-artifacts/README.md)
+## 6) Recommended Reading Order
+
+If you are new to the project, this reading order works well:
+
+1. [docs/01-architecture/README.md](./docs/01-architecture/README.md)
+2. [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)
+3. [docs/03-debugging/README.md](./docs/03-debugging/README.md)
+4. [docs/04-drivers/README.md](./docs/04-drivers/README.md)
+5. [docs/05-artifacts/README.md](./docs/05-artifacts/README.md)
+6. [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
 
 ## License
 
