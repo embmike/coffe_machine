@@ -30,7 +30,6 @@ MEMORY
   SDRAM        (xrw) : ORIGIN = 0xD0000000, LENGTH = 8M
   FLASH        (rx)  : ORIGIN = 0x90000000, LENGTH = 2048K
   ASSETS_FLASH (r)   : ORIGIN = 0x90200000, LENGTH = 126M
-  BOOTLOADER   (xrw) : ORIGIN = 0x08000000, LENGTH = 128K
 }
 
 _estack = ORIGIN(DTCMRAM) + LENGTH(DTCMRAM);
@@ -105,12 +104,6 @@ SECTIONS
 
 SECTIONS
 {
-  .bootloader :
-  {
-    . = ALIGN(4);
-    KEEP(*bootloader.o(*))
-  } >BOOTLOADER
-
   .text :
   {
     . = ALIGN(4);

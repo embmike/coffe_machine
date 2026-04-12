@@ -58,15 +58,6 @@ Current status:
 - preferred workflow when the developer wants to inspect the real bootloader-to-application hand-off
 - depends on specific VisualGDB profile settings that were added to stabilize this path
 
-### Direct App Debug
-
-Current status: experimental / not the default path.
-
-Reason:
-
-- direct start of the XIP application without the normal bootloader path was not robust enough in the current setup
-- this path should not be the default developer workflow
-
 ## IDE Workflow
 
 ### Bootloader Debug
@@ -114,7 +105,7 @@ The validated Boot-to-App debug path is not just a sequence of manual commands. 
 Primary files:
 
 - [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
-- [requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+- [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/tools/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
 
 Important settings in the Boot-to-App profile:
 
@@ -131,7 +122,7 @@ Important settings in the Boot-to-App profile:
 Where to find these:
 
 - [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
-- [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+- [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/tools/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
 
 IDE locations and XML hints:
 
@@ -148,7 +139,7 @@ IDE locations and XML hints:
   - XML location: `<FLASHPatcher xsi:nil="true" />`
   - files:
     - [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
-    - [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+    - [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/tools/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
 
 Why these mattered:
 
@@ -217,10 +208,6 @@ Example:
 
 - `flash_app` programs the external application image
 - [coffee_machine](C:/st_apps/coffee_machine/build/VisualGDB/Debug/coffee_machine) is the application debug target
-
-### Direct app boot is not the default path
-
-The direct application debug path is experimental and should not be used as the main workflow.
 
 ### Boot-to-App breakpoints must be reset after symbol loading
 

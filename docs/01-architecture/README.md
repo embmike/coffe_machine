@@ -178,6 +178,8 @@ These files are central to understanding the final architecture:
   - board-level QSPI support
 - [Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_sdram.c](C:/st_apps/coffee_machine/Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_sdram.c)
   - board-level SDRAM support
+- [tools/visualgdb/README.md](C:/st_apps/coffee_machine/tools/visualgdb/README.md)
+  - switchable VisualGDB profile templates used for project debug workflows
 
 ## Important Project and Board Settings
 
@@ -202,7 +204,7 @@ The stable debug strategy is split by developer use case:
 The most important project files behind this are:
 
 - [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
-- [requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+- [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/tools/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
 
 These files matter because the runtime architecture alone was not enough. The IDE/debugger startup behavior also had to be aligned with the bootloader-to-application hand-off.
 
@@ -252,14 +254,14 @@ The second disables VisualGDB flash hotpatching for this path.
 
 Where to find them:
 
-- `mon gdb_breakpoint_override hard`
+  - `mon gdb_breakpoint_override hard`
   - [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
-  - [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+  - [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/tools/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
   - inside the OpenOCD startup command list
 
 - `FLASHPatcher xsi:nil="true"`
   - [coffee_machine.vgdbcmake](C:/st_apps/coffee_machine/coffee_machine.vgdbcmake)
-  - [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/requirements/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
+  - [coffee_machine.boot_to_app_debug.vgdbcmake](C:/st_apps/coffee_machine/tools/visualgdb/coffee_machine.boot_to_app_debug.vgdbcmake)
   - as the XML `<FLASHPatcher xsi:nil="true" />` node
 
 This combination turned out to be essential for reliable early application breakpoints after startup.

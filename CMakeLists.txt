@@ -12,7 +12,6 @@ add_bsp_based_executable(
 
 set(TOUCHGFX_ROOT ${CMAKE_CURRENT_LIST_DIR}/Middlewares/ST/touchgfx)
 set(TOUCHGFX_LIB ${TOUCHGFX_ROOT}/lib/core/cortex_m7/gcc/libtouchgfx-float-abi-hard.a)
-set(BOOTLOADER_OBJECT ${CMAKE_CURRENT_LIST_DIR}/ExtMem_Boot/bootloader.o)
 set(TARGET_HEX ${CMAKE_CURRENT_BINARY_DIR}/target.hex)
 set(APP_TARGET_HEX ${CMAKE_CURRENT_BINARY_DIR}/app_target.hex)
 set(INTFLASH_HEX ${CMAKE_CURRENT_BINARY_DIR}/intflash.hex)
@@ -46,8 +45,8 @@ set(BSP_DRIVER_SOURCES
 	${BSP_MT48_ROOT}/mt48lc4m32b2.c)
 
 set(APP_SUPPORT_SOURCES
-	${CMAKE_CURRENT_LIST_DIR}/Core/Src/coffee_machine_simulation.cpp
-	${CMAKE_CURRENT_LIST_DIR}/Core/Src/countdown_formatter.cpp)
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/coffee_machine_simulation.cpp
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/countdown_formatter.cpp)
 
 set(EXTMEM_BOOT_SOURCES
 	${CMAKE_CURRENT_LIST_DIR}/ExtMem_Boot/Src/fmc.c
@@ -86,7 +85,8 @@ if(TARGET BSP)
 		${BSP_FT5336_ROOT}
 		${BSP_MT25_ROOT}
 		${BSP_MT48_ROOT}
-		${CMAKE_CURRENT_LIST_DIR}/Core/Inc)
+		${CMAKE_CURRENT_LIST_DIR}/Core/Inc
+		${CMAKE_CURRENT_LIST_DIR}/coffee_machine)
 
 	target_sources(BSP PRIVATE
 		${TOUCHGFX_APP_SOURCES}
@@ -102,8 +102,7 @@ if(TARGET BSP)
 endif()
 
 target_link_libraries(coffee_machine PRIVATE
-	${TOUCHGFX_LIB}
-	${BOOTLOADER_OBJECT})
+	${TOUCHGFX_LIB})
 
 add_executable(extmem_bootloader ${EXTMEM_BOOT_SOURCES})
 target_include_directories(extmem_bootloader PRIVATE
@@ -163,7 +162,7 @@ if(CMAKE_OBJCOPY)
 
 	add_custom_command(
 		OUTPUT ${APP_TARGET_HEX}
-		COMMAND ${CMAKE_OBJCOPY} -O ihex --remove-section=.bootloader $<TARGET_FILE:coffee_machine> ${APP_TARGET_HEX}
+		COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:coffee_machine> ${APP_TARGET_HEX}
 		DEPENDS coffee_machine
 		COMMENT "Generating app_target.hex for QSPI XIP application"
 		VERBATIM)
