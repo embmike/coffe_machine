@@ -45,21 +45,6 @@ Main sections:
 - `Doxygen Rules For Test Files`
 - `CMake Direction`
 
-### Test manager
-
-Primary interest:
-
-- which test layer exists today
-- which source areas are already covered
-- which parts remain board-side
-
-Main sections:
-
-- `Current Status`
-- `Current Coverage Areas`
-- `Test Strategy`
-- `Rollout Status`
-
 ## Current Status
 
 The first host-side unit-test wave is implemented and running.

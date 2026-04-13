@@ -118,7 +118,6 @@ Typical roles:
 - application user
 - software developer
 - tester
-- test manager
 
 Recommended starting points:
 
@@ -131,8 +130,6 @@ Recommended starting points:
   - [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
   - [docs/07-testing/README.md](./docs/07-testing/README.md)
 - tester
-  - [docs/07-testing/README.md](./docs/07-testing/README.md)
-- test manager
   - [docs/07-testing/README.md](./docs/07-testing/README.md)
 
 ## 5) Development Environment
