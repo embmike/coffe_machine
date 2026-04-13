@@ -38,7 +38,7 @@ The current demonstrator flow is:
 8. brewing screen with progress, countdown, pouring animation, and steam animation
 
 <img src="https://github.com/embmike/coffe_machine/blob/main/Images/brewing_screen.jpeg" alt="Brewing screenshot" width="30%" />
-   
+
 10. automatic return to the selection screen
 
 Current drink variants:
@@ -162,6 +162,8 @@ Detailed guide:
 - [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)
 
 ## 4) Architecture Overview
+
+The software architecture follows the [Model-View-Presenter]([Model-View-Presenter Design Pattern | TouchGFX Documentation](https://support.touchgfx.com/docs/development/ui-development/software-architecture/model-view-presenter-design-pattern)) pattern.
 
 This project is built around a two-stage runtime:
 
