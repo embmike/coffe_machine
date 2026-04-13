@@ -122,7 +122,7 @@ Typical roles:
 Recommended starting points:
 
 - application user
-  - [README.md](./README.md)
+  - documented in this main README
 - software developer
   - [docs/01-architecture/README.md](./docs/01-architecture/README.md)
   - [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)

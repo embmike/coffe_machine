@@ -18,12 +18,12 @@ This is the main system view:
 
 ```mermaid
 flowchart TD
-    USER["User"] --> DISPLAY["Display and touch workflow"]
+    USER["User"] --> DISPLAY["Display and touch"]
     DISPLAY --> UI["TouchGFX views and presenters"]
-    UI --> MODEL["Model and CoffeeMachineSimulation"]
-    MODEL --> APP["Application and board facades"]
+    UI --> MODEL["Model and simulation"]
+    MODEL --> APP["App and board facades"]
     APP --> BSP["BSP and HAL drivers"]
-    BSP --> HW["STM32H750B-DK board hardware"]
+    BSP --> HW["STM32H750B-DK hardware"]
     BOOT["extmem_bootloader<br/>internal flash"] --> HW
     BOOT --> APP
 ```
