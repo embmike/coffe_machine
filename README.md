@@ -12,6 +12,17 @@ Coffee machine demonstrator for the **STM32H750B-DK** with:
 
 The project is a demonstrator for a small embedded coffee machine UI on the **STM32H750B-DK**.
 
+Its purpose is to show a complete interactive device flow on real hardware:
+
+- boot from internal flash through a bootloader
+- start the main application from external QSPI flash
+- present a touch-driven coffee selection on the display
+- simulate a brewing cycle with progress, countdown, and animation
+
+From a user point of view, the demonstrator answers a simple question:
+
+- can the board behave like a small coffee-machine front panel with a clear, touch-based workflow?
+
 At runtime it:
 
 - boots through an internal bootloader
@@ -19,6 +30,11 @@ At runtime it:
 - jumps into the main application running from external flash
 - brings up LTDC, framebuffer, touch, and UART diagnostics
 - shows a TouchGFX-based coffee-machine flow
+
+The application is therefore both:
+
+- a user-facing UI demonstrator
+- a technical demonstrator for boot, XIP, SDRAM framebuffer, touch input, and TouchGFX integration
 
 The current demonstrator flow is:
 
@@ -48,7 +64,29 @@ Current drink variants:
 - Latte
 - Americano
 
-## 2) Workflows
+## 2) How does the user use the application?
+
+The intended user interaction is simple:
+
+1. power or reset the board
+2. wait for the splash screen
+3. select a drink on the touch display
+4. watch the brewing screen
+5. wait for the automatic return to the selection screen
+
+What the user can do:
+
+- choose between the available coffee variants
+- observe progress, countdown, pouring animation, and steam animation
+- start another simulated brewing cycle after the previous one ends
+
+What this demonstrator does not try to be:
+
+- a real coffee machine controller
+- a safety-critical product
+- a full appliance backend with pumps, heaters, valves, or sensors
+
+## 3) Workflows
 
 The project is organized around a few practical use cases:
 
@@ -71,7 +109,7 @@ The main developer-facing entry points are:
   - `flash_app`
   - `flash_system`
 
-## 3) Roles
+## 4) Roles
 
 The documentation is intentionally written so different readers can enter from different angles.
 
@@ -93,13 +131,11 @@ Recommended starting points:
   - [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
   - [docs/07-testing/README.md](./docs/07-testing/README.md)
 - tester
-  - [docs/08-tester-guide/README.md](./docs/08-tester-guide/README.md)
   - [docs/07-testing/README.md](./docs/07-testing/README.md)
 - test manager
   - [docs/07-testing/README.md](./docs/07-testing/README.md)
-  - [docs/08-tester-guide/README.md](./docs/08-tester-guide/README.md)
 
-## 4) Development Environment
+## 5) Development Environment
 
 The validated development setup for this repository is currently:
 
@@ -194,7 +230,7 @@ Detailed guide:
 
 - [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)
 
-## 5) Architecture Overview
+## 6) Architecture Overview
 
 The software architecture follows the [Model-View-Presenter]([Model-View-Presenter Design Pattern | TouchGFX Documentation](https://support.touchgfx.com/docs/development/ui-development/software-architecture/model-view-presenter-design-pattern)) pattern.
 
@@ -229,7 +265,7 @@ Read the full architecture chapter here:
 
 - [docs/01-architecture/README.md](./docs/01-architecture/README.md)
 
-## 6) Documentation Map
+## 7) Documentation Map
 
 The developer documentation is split by responsibility and workflow:
 
@@ -246,9 +282,7 @@ The developer documentation is split by responsibility and workflow:
 - [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
   - TouchGFX flow, model/presenter ownership, simulation contract, UI assets
 - [docs/07-testing/README.md](./docs/07-testing/README.md)
-  - unit-test scope, MVP-aligned test strategy, naming rules, Doxygen rules, rollout plan
-- [docs/08-tester-guide/README.md](./docs/08-tester-guide/README.md)
-  - Visual Studio click path, Test Explorer usage, and role-specific guidance for testers, developers, and test managers
+  - unit-test scope, MVP-aligned test strategy, naming rules, Doxygen rules, Test Explorer usage, and role-specific guidance
 
 ### Driver chapters
 
@@ -258,7 +292,7 @@ The developer documentation is split by responsibility and workflow:
 - [docs/04-drivers/touch-input.md](./docs/04-drivers/touch-input.md)
 - [docs/04-drivers/uart-debug.md](./docs/04-drivers/uart-debug.md)
 
-## 7) Path Notes
+## 8) Path Notes
 
 Some files in this repository still contain absolute Windows paths.
 
@@ -299,7 +333,7 @@ Practical note:
 - `CMakeLists.txt` contains Windows default search paths for `STM32_Programmer_CLI`
 - the `.vgdbcmake` files contain debugger startup commands with absolute local build paths
 
-## 8) File Responsibilities
+## 9) File Responsibilities
 
 | File | Responsibility |
 |---|---|
@@ -317,7 +351,7 @@ Practical note:
 | `Drivers/BSP/STM32H750B-DK/...` | Board-level QSPI, SDRAM, LTDC, and touch support. |
 | `tools/visualgdb/...` | VisualGDB profile support files for validated debug workflows. |
 
-## 9) Recommended Reading Order
+## 10) Recommended Reading Order
 
 If you are new to the project, this reading order works well:
 
@@ -328,7 +362,6 @@ If you are new to the project, this reading order works well:
 5. [docs/05-artifacts/README.md](./docs/05-artifacts/README.md)
 6. [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
 7. [docs/07-testing/README.md](./docs/07-testing/README.md)
-8. [docs/08-tester-guide/README.md](./docs/08-tester-guide/README.md)
 
 ## License
 

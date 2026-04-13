@@ -9,6 +9,57 @@ This chapter is both:
 - the test concept
 - the current implementation guide for the host-side unit-test layer
 
+## Audience And Entry Points
+
+Different readers enter this chapter with different goals.
+
+### Tester
+
+Primary interest:
+
+- how to run host-side unit tests
+- how to use the Test Explorer
+- when to use PC tests and when to use board tests
+
+Main sections:
+
+- `Visual Studio Click Path`
+- `Typical Mistakes`
+- `Validated Visual Studio View`
+
+### Software developer
+
+Primary interest:
+
+- testable units
+- seams and interfaces
+- naming rules
+- Doxygen conventions
+- host-side CMake structure
+
+Main sections:
+
+- `Unit-Test Targets`
+- `Implemented Test Seams`
+- `Naming Rules For Test Code`
+- `Doxygen Rules For Test Files`
+- `CMake Direction`
+
+### Test manager
+
+Primary interest:
+
+- which test layer exists today
+- which source areas are already covered
+- which parts remain board-side
+
+Main sections:
+
+- `Current Status`
+- `Current Coverage Areas`
+- `Test Strategy`
+- `Rollout Status`
+
 ## Current Status
 
 The first host-side unit-test wave is implemented and running.
@@ -32,7 +83,7 @@ Current implemented seams:
 - `ISelection_View`
 - `ISplash_View`
 
-That means the original test concept is no longer only a plan. It is already the working structure for the handwritten host-side tests.
+So this chapter is no longer only a plan. It also describes the working host-side unit-test setup.
 
 ## Scope
 
@@ -85,7 +136,7 @@ Later board-side scenario checks are intended for:
 
 The handwritten GUI-side code follows the Model-View-Presenter pattern.
 
-That matters for testing because each layer has a different test role:
+For testing, each layer has a different role:
 
 - `Model`
   - owns UI-facing state progression and listener notifications
@@ -101,7 +152,7 @@ Unit tests should primarily target:
 - domain logic outside TouchGFX
 - small application facades outside TouchGFX startup glue
 
-The concrete TouchGFX views themselves are not the primary unit-test target. They should stay as thin as practical and continue to own real widget behavior.
+The concrete TouchGFX views themselves are not the primary unit-test target. They should stay thin and continue to own real widget behavior.
 
 ## Unit-Test Targets
 
@@ -109,7 +160,7 @@ The current handwritten source files are split into two groups.
 
 ### Group 1: Active unit-test targets
 
-These files are now part of the implemented host-side unit-test set:
+These files are part of the implemented host-side unit-test set:
 
 - [coffee_machine/coffee_machine_app.hpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.hpp)
 - [coffee_machine/coffee_machine_app.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.cpp)
@@ -518,17 +569,16 @@ For day-to-day Visual Studio work, the recommended entry point is the dedicated 
 - [tests/CMakeLists.txt](C:/st_apps/coffee_machine/tests/CMakeLists.txt)
 - [tests/CMakePresets.json](C:/st_apps/coffee_machine/tests/CMakePresets.json)
 
-## Visual Studio Goal
+## Short Workflow
 
-The intended day-to-day workflow is:
+The day-to-day workflow is:
 
 1. open [tests](C:/st_apps/coffee_machine/tests) as its own Visual Studio CMake workspace
-2. build the host-side test target in Visual Studio
-3. run tests in Test Explorer
-4. keep failures local and fast
-5. use board-side Python checks later for end-to-end scenarios
+2. build `coffee_machine_unittest`
+3. run the tests in Test Explorer
+4. use later board-side Python checks for end-to-end scenarios
 
-Example local commands:
+Shell equivalent:
 
 ```powershell
 cmake -S tests -B build/host-unittest-standalone -G "Visual Studio 17 2022"
@@ -536,11 +586,82 @@ cmake --build build/host-unittest-standalone --config Debug --target coffee_mach
 ctest -C Debug --test-dir build/host-unittest-standalone --output-on-failure
 ```
 
-That split keeps:
+This split keeps:
 
 - unit-test feedback fast
 - hardware checks realistic
 - failure analysis simpler
+
+## Visual Studio Click Path
+
+The following path is the recommended manual workflow in Visual Studio for click-based users.
+
+### A. Open the unit-test workspace in Visual Studio
+
+1. Start Visual Studio 2022.
+2. Open the folder:
+   - `C:/st_apps/coffee_machine/tests`
+
+Expected result:
+
+- Visual Studio loads only the host-side test workspace
+- the project tree stays small and focused on unit tests
+
+### B. Select the host-side test preset
+
+1. Locate the CMake preset selector in the Visual Studio toolbar.
+2. Open the preset drop-down.
+3. Select:
+   - `Build Host Unittest Debug`
+
+Practical note:
+
+- the internal preset name is `host-unittest-debug`
+- Visual Studio can show the display name `Build Host Unittest Debug` in the toolbar instead
+- that is the correct selection
+
+### C. Build the unit-test target
+
+Simplest path:
+
+1. In the Visual Studio menu, click:
+   - `Build`
+   - `Build All`
+
+Alternative path:
+
+1. Open the Project Explorer or CMake target view.
+2. Find:
+   - `coffee_machine_unittest`
+3. Build that target.
+
+Expected result:
+
+- the host-side test executable is built successfully
+
+### D. Open the Test Explorer
+
+1. In Visual Studio, open:
+   - `Test`
+   - `Test Explorer`
+2. Wait briefly for test discovery.
+
+Expected result:
+
+- GoogleTest test cases from `coffee_machine_unittest` are discovered
+- the test tree appears under:
+  - `coffee_machine_unittest`
+  - `<empty namespace>`
+
+### E. Run the tests
+
+1. In Test Explorer, click:
+   - `Run All`
+
+Expected result:
+
+- the tests execute on the PC
+- no board is required
 
 ## Rollout Status
 
@@ -580,6 +701,71 @@ Representative test cases:
 - `Tick_Notifies_Completion_After_Done_Hold`
 - `Activate_Updates_View_With_Current_Session`
 - `Start_Brewing_Forwards_Type_To_Model`
+
+## Typical Mistakes
+
+### 1. Using the embedded target world for unit tests
+
+Symptom:
+
+- `googletest` errors inside an embedded or cross-compiling setup
+- VisualGDB tries to inspect `coffee_machine_unittest.exe` like an ELF file
+- memory-utilization messages appear for a Windows `.exe`
+
+Fix:
+
+- open [tests](C:/st_apps/coffee_machine/tests) as the unit-test workspace
+- switch to `Build Host Unittest Debug`
+
+### 2. Expecting the board for host-side tests
+
+Symptom:
+
+- confusion about flashing, debugging probes, or target startup
+
+Fix:
+
+- host-side unit tests do not need the board
+
+### 3. Building the wrong target
+
+Symptom:
+
+- Test Explorer stays empty
+
+Fix:
+
+- use `Build -> Build All` in the [tests](C:/st_apps/coffee_machine/tests) workspace
+- or build `coffee_machine_unittest`, not `coffee_machine`
+
+### 4. Mixing the workflows mentally
+
+Symptom:
+
+- uncertainty about whether to use `flash_app`, `flash_bootloader`, or Test Explorer
+
+Fix:
+
+- flash targets belong to embedded work
+- Test Explorer belongs to `host-unittest-debug`
+
+## Validated Visual Studio View
+
+The currently validated click path produced the following visible result in Test Explorer:
+
+- test container `coffee_machine_unittest`
+- node `<empty namespace>`
+- discovered groups:
+  - `BrewingScreenPresenterTests`
+  - `CoffeeMachineAppTests`
+  - `CoffeeMachineSimulationTests`
+  - `CountdownFormatterTests`
+  - `ModelTests`
+  - `SlectionScreenPresenterTests`
+  - `SplashScreenPresenterTests`
+- total result:
+  - `28` tests
+  - `28` passed
 
 ## Safe Edit Boundaries
 

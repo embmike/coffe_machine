@@ -18,7 +18,7 @@ It does not describe the host-side unit-test workflow in Visual Studio Test Expl
 
 For that path, use:
 
-- [docs/08-tester-guide/README.md](C:/st_apps/coffee_machine/docs/08-tester-guide/README.md)
+- [docs/07-testing/README.md](C:/st_apps/coffee_machine/docs/07-testing/README.md)
 
 ## Debug Scenarios
 

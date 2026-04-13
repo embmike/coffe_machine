@@ -21,7 +21,6 @@ It does not cover the host-side unit-test world.
 For that path, use:
 
 - [docs/07-testing/README.md](C:/st_apps/coffee_machine/docs/07-testing/README.md)
-- [docs/08-tester-guide/README.md](C:/st_apps/coffee_machine/docs/08-tester-guide/README.md)
 
 ## Build Configurations
 

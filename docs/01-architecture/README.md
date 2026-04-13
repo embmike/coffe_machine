@@ -4,6 +4,36 @@
 
 Describe the runtime architecture and explain why it was chosen.
 
+## Big Picture
+
+The architecture is easiest to understand from top to bottom:
+
+1. the user sees the display and uses the touch workflow
+2. the application owns UI logic and brewing behavior
+3. TouchGFX, handwritten code, and generated code sit on top of drivers
+4. board support and HAL connect software to the STM32H750B-DK hardware
+5. a small internal bootloader prepares external memory before the application starts
+
+This is the main system view:
+
+```mermaid
+flowchart TD
+    USER["User"] --> DISPLAY["Display and touch workflow"]
+    DISPLAY --> UI["TouchGFX views and presenters"]
+    UI --> MODEL["Model and CoffeeMachineSimulation"]
+    MODEL --> APP["Application and board facades"]
+    APP --> BSP["BSP and HAL drivers"]
+    BSP --> HW["STM32H750B-DK board hardware"]
+    BOOT["extmem_bootloader<br/>internal flash"] --> HW
+    BOOT --> APP
+```
+
+Practical reading rule:
+
+- start at the top if you want to understand the product behavior
+- start in the middle if you want to understand handwritten software responsibilities
+- start at the bottom if you are debugging bring-up, memory, or board hardware
+
 ## Runtime Layout
 
 This project uses a two-stage runtime layout:
@@ -17,11 +47,12 @@ This split was chosen because the STM32H750 device has limited internal flash, w
 
 ## Developer Structure
 
-The architecture is easiest to understand through three complementary views:
+The rest of this chapter uses four complementary views:
 
 1. system structure
 2. runtime control flow
 3. TouchGFX and domain collaboration
+4. memory and boot constraints
 
 ## System Structure Diagram
 
@@ -441,15 +472,3 @@ The following ST documents were important references while shaping this architec
 - [AN5188 - External memory code execution on STM32F7x0 value line, STM32H750 value line, STM32H7B0 value line and STM32H730 value line MCUs](https://www.st.com/resource/en/application_note/an5188-external-memory-code-execution-on-stm32f7x0-value-line-stm32h750-value-line-stm32h7b0-value-line-and-stm32h730-value-line-mcus-stmicroelectronics.pdf)
 - [UM2488 - Discovery kit with STM32H750XB microcontroller](https://www.st.com/resource/en/user_manual/um2488-discovery-kits-with-stm32h745xi-and-stm32h750xb-microcontrollers-stmicroelectronics.pdf)
 - [STM32H750 Value Line product page](https://www.st.com/en/microcontrollers-microprocessors/stm32h750-value-line.html)
-
-## Diagram
-
-```mermaid
-flowchart TD
-    A["Internal flash boot"] --> B["extmem_bootloader"]
-    B --> C["Initialize external memories"]
-    C --> D["NVIC cleanup + SysTick stop"]
-    D --> E["Set VTOR / MSP"]
-    E --> F["Jump to XIP application"]
-    F --> G["coffee_machine main()"]
-```

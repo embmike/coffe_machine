@@ -230,4 +230,4 @@ The practical split is:
 
 For the tester-facing workflow, continue with:
 
-- [docs/08-tester-guide/README.md](C:/st_apps/coffee_machine/docs/08-tester-guide/README.md)
+- [docs/07-testing/README.md](C:/st_apps/coffee_machine/docs/07-testing/README.md)
