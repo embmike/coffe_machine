@@ -4,6 +4,25 @@
 
 Explain build configurations, flash targets, and developer workflows.
 
+## Scope Boundary
+
+This chapter describes the embedded build and flash world.
+
+It covers:
+
+- `coffee_machine`
+- `extmem_bootloader`
+- `flash_app`
+- `flash_bootloader`
+- `flash_system`
+
+It does not cover the host-side unit-test world.
+
+For that path, use:
+
+- [docs/07-testing/README.md](C:/st_apps/coffee_machine/docs/07-testing/README.md)
+- [docs/08-tester-guide/README.md](C:/st_apps/coffee_machine/docs/08-tester-guide/README.md)
+
 ## Build Configurations
 
 ### Debug
@@ -96,6 +115,23 @@ What it writes:
 
 ## Typical Workflows
 
+## Host-side unit tests are a separate path
+
+Host-side unit tests are intentionally not part of the embedded flash workflow.
+
+Important practical rule:
+
+- do not use `flash_app`, `flash_bootloader`, or `flash_system` for host-side unit tests
+
+The host-side unit-test path uses:
+
+- the separate Visual Studio CMake workspace at [tests](C:/st_apps/coffee_machine/tests)
+- preset `host-unittest-debug`
+- target `coffee_machine_unittest`
+- Visual Studio Test Explorer or `ctest`
+
+That path belongs to the PC-side test world and does not require the board.
+
 ### Update and debug the bootloader
 
 Recommended configuration: `Debug`
@@ -140,6 +176,7 @@ Use this workflow for:
 - LTDC / framebuffer debugging
 - UART diagnostic flow
 - TouchGFX integration work
+- target-side validation after unit-test work on the PC
 
 ### Program the complete system
 
@@ -205,3 +242,14 @@ At the current project maturity, Boot-to-App debug is the main exception. The va
 - [Debugging](C:/st_apps/coffee_machine/docs/03-debugging/README.md)
 
 Manual GDB work should still be treated as a controlled workflow step, not as ad-hoc trial-and-error.
+
+## Satisfaction Check
+
+This chapter is in a good place if a reader can answer these questions:
+
+- which parts belong to the embedded build and flash world?
+- which flash target writes what?
+- when should `flash_system` be used instead of `flash_app`?
+- why are host-side unit tests not described as flash workflows here?
+
+That is the bar this chapter is meant to meet.

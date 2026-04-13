@@ -1,0 +1,39 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "host-unittest-debug",
+      "displayName": "Host Unittest Debug",
+      "description": "Build the host-side unit tests with MSVC for Test Explorer.",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/../build/host-unittest-standalone"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "build-host-unittest-debug",
+      "displayName": "Build Host Unittest Debug",
+      "configurePreset": "host-unittest-debug",
+      "configuration": "Debug",
+      "targets": [
+        "coffee_machine_unittest"
+      ]
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "test-host-unittest-debug",
+      "displayName": "Test Host Unittest Debug",
+      "configurePreset": "host-unittest-debug",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

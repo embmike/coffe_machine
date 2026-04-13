@@ -1,24 +1,52 @@
-﻿# Testing
+# Testing
 
 ## Goal
 
-Describe the unit-test strategy for the handwritten application logic, define the intended test boundaries, and provide a practical introduction path for GoogleTest and gMock in this repository.
+Describe the unit-test strategy for the handwritten application logic, define the current test boundaries, and provide a practical entry path for GoogleTest and gMock in this repository.
 
-This chapter is the planning and implementation guide for the unit-test layer.
+This chapter is both:
+
+- the test concept
+- the current implementation guide for the host-side unit-test layer
+
+## Current Status
+
+The first host-side unit-test wave is implemented and running.
+
+Current verified areas:
+
+- `coffee_machine_app`
+- `countdown_formatter`
+- `coffee_machine_simulation`
+- `Model`
+- `slection_screenPresenter`
+- `brewing_screenPresenter`
+- `splash_screenPresenter`
+
+Current implemented seams:
+
+- `IApp_Runtime`
+- `ITick_Source`
+- `IModel`
+- `IBrewing_View`
+- `ISelection_View`
+- `ISplash_View`
+
+That means the original test concept is no longer only a plan. It is already the working structure for the handwritten host-side tests.
 
 ## Scope
 
 This chapter covers:
 
 - unit-test goals
-- test boundaries
+- current test boundaries
 - testable source files
 - files intentionally excluded from unit tests
-- required small refactorings
+- implemented test seams
 - naming rules for test code
 - Doxygen rules for test files
-- Visual Studio and Test Explorer integration goals
-- phased introduction plan
+- Visual Studio and Test Explorer usage
+- current rollout status
 
 This chapter does not define:
 
@@ -33,7 +61,7 @@ Those topics belong to later validation work outside the C++ unit-test layer.
 
 The project uses two complementary test layers:
 
-1. host-based C++ unit tests
+1. host-side C++ unit tests
 2. later PC-driven board scenario tests
 
 The first layer is the focus of this chapter.
@@ -41,9 +69,10 @@ The first layer is the focus of this chapter.
 Unit tests are intended for:
 
 - deterministic business logic
-- presenter-to-model and presenter-to-view interaction logic
+- presenter-to-model interaction logic
+- presenter-to-view interaction logic
 - small formatting helpers
-- code that can run without HAL, TouchGFX runtime startup, or board hardware
+- handwritten startup facades that can be isolated behind small interfaces
 
 Later board-side scenario checks are intended for:
 
@@ -70,17 +99,20 @@ Unit tests should primarily target:
 - model logic
 - presenter interaction logic
 - domain logic outside TouchGFX
+- small application facades outside TouchGFX startup glue
 
-The real TouchGFX views themselves are not the primary unit-test target. They are better treated as framework-facing code with as little handwritten logic as possible.
+The concrete TouchGFX views themselves are not the primary unit-test target. They should stay as thin as practical and continue to own real widget behavior.
 
 ## Unit-Test Targets
 
-The current handwritten source files are split into three groups.
+The current handwritten source files are split into two groups.
 
-### Group 1: Immediate unit-test targets
+### Group 1: Active unit-test targets
 
-These files provide the best value for the first test wave:
+These files are now part of the implemented host-side unit-test set:
 
+- [coffee_machine/coffee_machine_app.hpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.hpp)
+- [coffee_machine/coffee_machine_app.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.cpp)
 - [coffee_machine/countdown_formatter.hpp](C:/st_apps/coffee_machine/coffee_machine/countdown_formatter.hpp)
 - [coffee_machine/countdown_formatter.cpp](C:/st_apps/coffee_machine/coffee_machine/countdown_formatter.cpp)
 - [coffee_machine/coffee_machine_simulation.hpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_simulation.hpp)
@@ -94,16 +126,9 @@ These files provide the best value for the first test wave:
 - [TouchGFX/gui/include/gui/splash_screen_screen/splash_screenPresenter.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/splash_screen_screen/splash_screenPresenter.hpp)
 - [TouchGFX/gui/src/splash_screen_screen/splash_screenPresenter.cpp](C:/st_apps/coffee_machine/TouchGFX/gui/src/splash_screen_screen/splash_screenPresenter.cpp)
 
-### Group 2: Deferred unit-test target
+### Group 2: Intentionally excluded from unit tests
 
-This file may be unit-tested later, but only after a small runtime abstraction is introduced:
-
-- [coffee_machine/coffee_machine_app.hpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.hpp)
-- [coffee_machine/coffee_machine_app.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.cpp)
-
-### Group 3: Intentionally excluded from unit tests
-
-This file is not part of the unit-test target set:
+This file is intentionally not part of the host-side unit-test scope:
 
 - [coffee_machine/coffee_machine_board.hpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.hpp)
 - [coffee_machine/coffee_machine_board.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_board.cpp)
@@ -114,7 +139,24 @@ Reason:
 - its direct dependencies are intentionally hardware-facing
 - its value is higher in board validation than in host-side unit isolation
 
-## Planned Test Coverage
+## Current Coverage Areas
+
+### coffee_machine_app
+
+Purpose:
+
+- verify the handwritten startup and process facade around TouchGFX
+
+Typical checks:
+
+- startup logs the expected path for the active build configuration
+- startup initializes TouchGFX exactly once
+- process forwards exactly one TouchGFX loop iteration
+
+Recommended tools:
+
+- `GoogleTest`
+- `gMock`
 
 ### countdown_formatter
 
@@ -162,7 +204,7 @@ Purpose:
 
 Typical checks:
 
-- `startBrewing()` starts a session and notifies the listener
+- `Start_Brewing()` starts a session and notifies the listener
 - first tick establishes the time base only
 - active ticks advance the simulation
 - completion notification happens after the done-hold interval
@@ -236,25 +278,23 @@ The practical rule is:
 
 - if a dependency talks directly to hardware or framework startup, isolate it behind a tiny handwritten interface or keep it out of the unit-test scope
 
-## Required Small Refactorings
+## Implemented Test Seams
 
-The goal is not a large redesign. Only the smallest useful seams should be introduced.
+The goal was not a large redesign. Only the smallest useful seams were introduced.
 
-### 1. Isolate the Model time source
+### 1. Model time source seam
 
-Current issue:
+Current implementation:
 
-- [TouchGFX/gui/src/model/Model.cpp](C:/st_apps/coffee_machine/TouchGFX/gui/src/model/Model.cpp) reads the current time internally through `HAL_GetTick()` or `std::chrono`
+- [TouchGFX/gui/include/gui/model/ModelInterfaces.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/model/ModelInterfaces.hpp)
+- [TouchGFX/gui/include/gui/model/Model.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/model/Model.hpp)
+- [TouchGFX/gui/src/model/Model.cpp](C:/st_apps/coffee_machine/TouchGFX/gui/src/model/Model.cpp)
 
-Planned change:
+Practical shape:
 
-- introduce a handwritten tick-source abstraction
-- inject it into `Model`
-
-Expected benefit:
-
-- deterministic tests for `tick()`
-- no hidden dependency on wall-clock timing
+- `ITick_Source` isolates time acquisition
+- `Model` accepts it through `Set_Tick_Source(...)`
+- tests can drive `tick()` deterministically without HAL or wall-clock timing
 
 Suggested interface:
 
@@ -266,31 +306,26 @@ class ITick_Source
 {
 public:
     virtual ~ITick_Source() = default;
-
-    /**
-     * @brief Returns the current tick time in milliseconds.
-     * @return Current tick time.
-     */
     virtual uint32_t Now_Ms() = 0;
 };
 ```
 
-### 2. Introduce tiny presenter-facing interfaces
+### 2. Presenter-facing seams
 
-Current issue:
+Current implementation:
 
-- presenters are tightly coupled to concrete TouchGFX view classes
+- [TouchGFX/gui/include/gui/model/ModelInterfaces.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/model/ModelInterfaces.hpp)
+- [TouchGFX/gui/include/gui/brewing_screen_screen/IBrewing_View.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/brewing_screen_screen/IBrewing_View.hpp)
+- [TouchGFX/gui/include/gui/slection_screen_screen/ISelection_View.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/slection_screen_screen/ISelection_View.hpp)
+- [TouchGFX/gui/include/gui/splash_screen_screen/ISplash_View.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/splash_screen_screen/ISplash_View.hpp)
 
-Planned change:
+Practical shape:
 
-- introduce small view and model interfaces where interaction behavior should be unit-tested
+- `IModel` gives presenters a narrow model contract
+- `IBrewing_View`, `ISelection_View`, and `ISplash_View` isolate presenter interaction from concrete screen classes
+- real view classes still implement the real UI behavior
 
-Expected benefit:
-
-- presenter tests become simple interaction tests
-- no need to instantiate real TouchGFX screen classes in unit tests
-
-Suggested examples:
+Suggested example:
 
 ```cpp
 /**
@@ -305,32 +340,35 @@ public:
 };
 ```
 
+### 3. Application runtime seam
+
+Current implementation:
+
+- [coffee_machine/coffee_machine_app.hpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.hpp)
+- [coffee_machine/coffee_machine_app.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.cpp)
+
+Practical shape:
+
+- `IApp_Runtime` isolates logging, delay, and TouchGFX startup/process calls
+- the existing production-facing free functions still exist
+- overloads with injected runtime adapters enable direct host-side tests
+
+Suggested example:
+
 ```cpp
 /**
- * @brief Model contract for the selection presenter.
+ * @brief Runtime contract for the handwritten TouchGFX application facade.
  */
-class ISelection_Model
+class IApp_Runtime
 {
 public:
-    virtual ~ISelection_Model() = default;
-    virtual void Start_Brewing(CoffeeType type) = 0;
+    virtual ~IApp_Runtime() = default;
+    virtual void Log(const char* message) = 0;
+    virtual void Delay_Ms(uint32_t delay_ms) = 0;
+    virtual void TouchGfx_Init() = 0;
+    virtual void TouchGfx_Process() = 0;
 };
 ```
-
-### 3. Defer coffee_machine_app until needed
-
-Current issue:
-
-- [coffee_machine/coffee_machine_app.cpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_app.cpp) directly calls runtime functions such as `HAL_Delay()`, `MX_TouchGFX_Init()`, and `MX_TouchGFX_Process()`
-
-Planned change:
-
-- no immediate action
-- only introduce a small runtime adapter if unit-test value becomes important
-
-Expected benefit:
-
-- the first test wave stays focused and small
 
 ## Naming Rules For Test Code
 
@@ -419,69 +457,84 @@ Practical rules:
 - keep comments short enough to stay readable
 - use English in the repository documentation and test code to match the existing project language
 
-## Planned Test Tree
+## Current Test Tree
 
-The recommended host-test structure is:
+The current host-test structure is:
 
 ```text
 tests/
   CMakeLists.txt
   unit/
+    coffee_machine_app_tests.cpp
     countdown_formatter_tests.cpp
     coffee_machine_simulation_tests.cpp
     model_tests.cpp
     slection_screen_presenter_tests.cpp
     brewing_screen_presenter_tests.cpp
     splash_screen_presenter_tests.cpp
-  doubles/
-    fake_tick_source.hpp
-    mock_model_listener.hpp
-    mock_selection_model.hpp
-    mock_brewing_view.hpp
 ```
 
 This is a working structure, not a rigid rule. The important part is:
 
 - production code stays in its current folders
 - tests live in a separate host-side tree
-- fakes and mocks are easy to find
+- test doubles are easy to find, even if they currently live inside the test translation units
 
 ## CMake Direction
 
-The recommended next step is a dedicated host-side CMake target for unit tests.
+The repository now contains a dedicated host-side CMake target for unit tests.
 
-Intended target:
+Current target:
 
-- `coffee_machine_unit_tests`
+- `coffee_machine_unittest`
 
-Main expectations:
+Main properties:
 
 - builds as a normal host executable on Windows
 - runs in Visual Studio
-- is visible in Test Explorer
+- is discoverable through `gtest_discover_tests(...)`
 - does not require STM32 startup files
 - links only the handwritten source files under test
 
-Expected ingredients:
+Current ingredients:
 
 - `GoogleTest`
 - `gMock`
 - `gtest_discover_tests(...)`
 
-The unit-test target should stay separate from:
+The unit-test target stays separate from:
 
 - the main STM32 application target
 - the bootloader target
 - flashing targets
 
+The top-level CMake entry point controls this through:
+
+- [CMakeLists.txt](C:/st_apps/coffee_machine/CMakeLists.txt)
+- option `ENABLE_UNIT_TESTS`
+
+For day-to-day Visual Studio work, the recommended entry point is the dedicated test workspace:
+
+- [tests/CMakeLists.txt](C:/st_apps/coffee_machine/tests/CMakeLists.txt)
+- [tests/CMakePresets.json](C:/st_apps/coffee_machine/tests/CMakePresets.json)
+
 ## Visual Studio Goal
 
 The intended day-to-day workflow is:
 
-1. build the host-side test target in Visual Studio
-2. run tests in Test Explorer
-3. keep failures local and fast
-4. use board-side Python checks later for end-to-end scenarios
+1. open [tests](C:/st_apps/coffee_machine/tests) as its own Visual Studio CMake workspace
+2. build the host-side test target in Visual Studio
+3. run tests in Test Explorer
+4. keep failures local and fast
+5. use board-side Python checks later for end-to-end scenarios
+
+Example local commands:
+
+```powershell
+cmake -S tests -B build/host-unittest-standalone -G "Visual Studio 17 2022"
+cmake --build build/host-unittest-standalone --config Debug --target coffee_machine_unittest
+ctest -C Debug --test-dir build/host-unittest-standalone --output-on-failure
+```
 
 That split keeps:
 
@@ -489,69 +542,44 @@ That split keeps:
 - hardware checks realistic
 - failure analysis simpler
 
-## Introduction Plan
+## Rollout Status
 
-The recommended rollout order is:
+The original rollout order has progressed as follows:
 
-1. Create the `tests/` tree and host-side `CMakeLists.txt`
-2. Add `countdown_formatter` tests
-3. Add `coffee_machine_simulation` tests
-4. Introduce `ITick_Source` and add `Model` tests
-5. Introduce small presenter-facing interfaces
-6. Add presenter tests
-7. Re-evaluate `coffee_machine_app`
+1. `tests/` tree and host-side `CMakeLists.txt`: done
+2. `countdown_formatter` tests: done
+3. `coffee_machine_simulation` tests: done
+4. `ITick_Source` and `Model` tests: done
+5. presenter-facing interfaces: done
+6. presenter tests: done
+7. `IApp_Runtime` and `coffee_machine_app` tests: done
 
-This order gives:
+Current next sensible expansion areas:
 
-- fast visible progress
-- low architectural churn
-- useful tests early
+- additional edge-case coverage in `coffee_machine_app`
+- finer-grained presenter tests if new handwritten behavior is added
+- extraction of shared test doubles only if the test tree grows enough to justify it
 
-## First Suggested Test Set
+## Current Test Set
 
-### countdown_formatter
+The current test tree already includes:
 
-- `Formats_Zero_Milliseconds_As_Zero`
-- `Truncates_Sub_Second_Value_To_Zero`
-- `Formats_One_Second_As_One`
-- `Returns_Safely_For_Null_Buffer`
-- `Returns_Safely_For_Zero_Buffer_Size`
+- `CoffeeMachineAppTests`
+- `CountdownFormatterTests`
+- `CoffeeMachineSimulationTests`
+- `ModelTests`
+- `SlectionScreenPresenterTests`
+- `BrewingScreenPresenterTests`
+- `SplashScreenPresenterTests`
 
-### coffee_machine_simulation
+Representative test cases:
 
-- `Find_Profile_Returns_Espresso_Profile`
+- `App_Start_Initializes_TouchGfx_And_Logs_Start_Path`
+- `App_Process_Forwards_One_TouchGfx_Iteration`
 - `Start_Initializes_Session_For_Espresso`
-- `Update_Advances_Progress_For_Active_Session`
-- `Update_Sets_Phase_To_Brewing_After_Twenty_Percent`
-- `Update_Sets_Phase_To_Finishing_After_Eighty_Percent`
-- `Update_Sets_Phase_To_Done_At_Hundred_Percent`
-- `Stop_Resets_Session_To_Idle`
-- `Reset_Clears_Active_State`
-- `Get_Coffee_Log_Name_Returns_Expected_Label`
-
-### Model
-
-- `Start_Brewing_Notifies_Updated_Session`
-- `Tick_Establishes_Time_Base_On_First_Call`
-- `Tick_Updates_Active_Session`
 - `Tick_Notifies_Completion_After_Done_Hold`
-- `Tick_Notifies_Completion_Only_Once`
-
-### selection presenter
-
-- `Start_Brewing_Forwards_Type_To_Model`
-- `Start_Brewing_Does_Nothing_Without_Model`
-
-### brewing presenter
-
 - `Activate_Updates_View_With_Current_Session`
-- `On_Brewing_Session_Updated_Forwards_Session_To_View`
-- `On_Brewing_Session_Completed_Forwards_To_View`
-
-### splash presenter
-
-- `Activate_Has_No_Side_Effect`
-- `Deactivate_Has_No_Side_Effect`
+- `Start_Brewing_Forwards_Type_To_Model`
 
 ## Safe Edit Boundaries
 
@@ -572,12 +600,12 @@ Avoid placing unit-test logic in:
 
 This chapter is in a good place if a developer can answer these questions from it:
 
-- which files belong in the first unit-test wave?
+- which files are currently covered by host-side unit tests?
 - which file is intentionally excluded?
 - where do model and presenter tests fit into MVP?
-- which small refactorings are expected?
+- which small test seams exist today?
 - how should test names be written?
 - how should test files and test goals be documented?
-- what is the recommended rollout order?
+- how is the host-side test tree configured and run?
 
 That is the bar this chapter is meant to meet.

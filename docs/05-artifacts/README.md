@@ -45,6 +45,26 @@ Main output:
 
 - [extmem_bootloader](C:/st_apps/coffee_machine/build/VisualGDB/Debug/extmem_bootloader)
 
+### `coffee_machine_unittest`
+
+Host-side unit-test project.
+
+Purpose:
+
+- build the handwritten host-side unit-test executable
+- run GoogleTest / gMock tests on the PC
+- support Visual Studio Test Explorer and `ctest`
+
+Typical developer or tester use:
+
+- verify isolated logic without the board
+- run regression checks after logic changes
+- investigate unit-test failures locally
+
+Main output in the standalone host-test workspace:
+
+- [coffee_machine_unittest.exe](C:/st_apps/coffee_machine/build/host-unittest-standalone/Debug/coffee_machine_unittest.exe)
+
 ## Flash Targets
 
 ### `flash_app`
@@ -177,6 +197,7 @@ These are the main things a developer builds and debugs:
 
 - `coffee_machine`
 - `extmem_bootloader`
+- `coffee_machine_unittest` in the host-side unit-test world
 
 ### Flash Targets
 
@@ -197,3 +218,16 @@ These exist to support packaging, flashing, and output generation:
 - `artifact_intflash_hex`
 
 Developers should usually start from the first two groups and only look at artifacts when needed.
+
+## Scope Reminder
+
+This chapter lists both embedded outputs and the host-side unit-test project.
+
+The practical split is:
+
+- board-side runtime and flashing -> `coffee_machine`, `extmem_bootloader`, flash targets
+- PC-side unit tests -> `coffee_machine_unittest`
+
+For the tester-facing workflow, continue with:
+
+- [docs/08-tester-guide/README.md](C:/st_apps/coffee_machine/docs/08-tester-guide/README.md)

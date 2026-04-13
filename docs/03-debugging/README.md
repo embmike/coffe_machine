@@ -4,7 +4,38 @@
 
 Explain which debug path to use for each developer use case.
 
+## Scope Boundary
+
+This chapter describes embedded debugging on the board.
+
+It covers:
+
+- bootloader debugging
+- boot-to-app debugging
+- application-side debugging on the target
+
+It does not describe the host-side unit-test workflow in Visual Studio Test Explorer.
+
+For that path, use:
+
+- [docs/08-tester-guide/README.md](C:/st_apps/coffee_machine/docs/08-tester-guide/README.md)
+
 ## Debug Scenarios
+
+### Host-side unit tests are not an embedded debug path
+
+`coffee_machine_unittest` is a host-side test target, not a board-debug target.
+
+Important practical rule:
+
+- if the task is PC-side unit testing, do not start from the embedded debug paths in this chapter
+
+Use instead:
+
+- the separate Visual Studio CMake workspace at [tests](C:/st_apps/coffee_machine/tests)
+- preset `host-unittest-debug`
+- target `coffee_machine_unittest`
+- Test Explorer or `ctest`
 
 ### Bootloader Debug
 
@@ -226,6 +257,17 @@ First verify:
 - the board actually ran past bootloader startup
 - the application reached the expected debug point
 - the host terminal was connected and ready after reset
+
+## Satisfaction Check
+
+This chapter is in a good place if a reader can answer these questions:
+
+- when do I use `extmem_bootloader` as the debug target?
+- when do I use `coffee_machine` as the debug target?
+- why is `coffee_machine_unittest` not part of these embedded debug paths?
+- where should a tester go instead when the task is host-side unit testing?
+
+That is the bar this chapter is meant to meet.
 
 ## Debug Flow Diagram
 

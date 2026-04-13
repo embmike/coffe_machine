@@ -1,0 +1,32 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "host-unittest-debug",
+      "displayName": "Host Unittest Debug",
+      "description": "Build only the host-side unit-test target with MSVC.",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/host-unittest",
+      "cacheVariables": {
+        "ENABLE_EMBEDDED_TARGETS": "OFF",
+        "ENABLE_UNIT_TESTS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "build-host-unittest-debug",
+      "displayName": "Build Host Unittest Debug",
+      "configurePreset": "host-unittest-debug",
+      "configuration": "Debug",
+      "targets": [
+        "coffee_machine_unittest"
+      ]
+    }
+  ]
+}

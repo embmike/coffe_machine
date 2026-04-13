@@ -48,9 +48,9 @@ Current drink variants:
 - Latte
 - Americano
 
-## 2) Developer Workflows
+## 2) Workflows
 
-The project is organized around a few practical developer use cases:
+The project is organized around a few practical use cases:
 
 - debug the bootloader
 - debug the application
@@ -58,23 +58,54 @@ The project is organized around a few practical developer use cases:
 - flash only the application
 - flash the full validated software stack
 - continue TouchGFX work without breaking the board bring-up
+- run host-side unit tests on the PC
 
 The main developer-facing entry points are:
 
 - projects
   - `extmem_bootloader`
   - `coffee_machine`
+  - `coffee_machine_unittest` in the separate host test workspace under [tests](./tests)
 - flash targets
   - `flash_bootloader`
   - `flash_app`
   - `flash_system`
 
-## 3) Development Environment
+## 3) Roles
+
+The documentation is intentionally written so different readers can enter from different angles.
+
+Typical roles:
+
+- application user
+- software developer
+- tester
+- test manager
+
+Recommended starting points:
+
+- application user
+  - [README.md](./README.md)
+- software developer
+  - [docs/01-architecture/README.md](./docs/01-architecture/README.md)
+  - [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)
+  - [docs/03-debugging/README.md](./docs/03-debugging/README.md)
+  - [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
+  - [docs/07-testing/README.md](./docs/07-testing/README.md)
+- tester
+  - [docs/08-tester-guide/README.md](./docs/08-tester-guide/README.md)
+  - [docs/07-testing/README.md](./docs/07-testing/README.md)
+- test manager
+  - [docs/07-testing/README.md](./docs/07-testing/README.md)
+  - [docs/08-tester-guide/README.md](./docs/08-tester-guide/README.md)
+
+## 4) Development Environment
 
 The validated development setup for this repository is currently:
 
 - Microsoft Visual Studio 2022
 - VisualGDB
+- GoogleTest / gMock for host-side unit tests
 - GNU Arm Embedded Toolchain (`arm-none-eabi-gcc`, `arm-none-eabi-g++`)
 - STM32CubeMX
 - TouchGFX Designer
@@ -84,6 +115,8 @@ In practice this means:
 
 - project generation and MCU configuration are maintained through STM32CubeMX
 - application and bootloader builds are driven through CMake / Ninja in VisualGDB
+- host-side unit tests are configured through [tests/CMakeLists.txt](./tests/CMakeLists.txt)
+- the recommended Visual Studio Test Explorer entry point is a separate CMake workspace opened at [tests](./tests)
 - board flashing can happen through the VisualGDB flash targets or STM32CubeProgrammer
 - TouchGFX screens and generated GUI code are maintained through TouchGFX Designer
 
@@ -161,7 +194,7 @@ Detailed guide:
 
 - [docs/02-build-and-flash/README.md](./docs/02-build-and-flash/README.md)
 
-## 4) Architecture Overview
+## 5) Architecture Overview
 
 The software architecture follows the [Model-View-Presenter]([Model-View-Presenter Design Pattern | TouchGFX Documentation](https://support.touchgfx.com/docs/development/ui-development/software-architecture/model-view-presenter-design-pattern)) pattern.
 
@@ -196,7 +229,7 @@ Read the full architecture chapter here:
 
 - [docs/01-architecture/README.md](./docs/01-architecture/README.md)
 
-## 5) Documentation Map
+## 6) Documentation Map
 
 The developer documentation is split by responsibility and workflow:
 
@@ -214,6 +247,8 @@ The developer documentation is split by responsibility and workflow:
   - TouchGFX flow, model/presenter ownership, simulation contract, UI assets
 - [docs/07-testing/README.md](./docs/07-testing/README.md)
   - unit-test scope, MVP-aligned test strategy, naming rules, Doxygen rules, rollout plan
+- [docs/08-tester-guide/README.md](./docs/08-tester-guide/README.md)
+  - Visual Studio click path, Test Explorer usage, and role-specific guidance for testers, developers, and test managers
 
 ### Driver chapters
 
@@ -223,7 +258,7 @@ The developer documentation is split by responsibility and workflow:
 - [docs/04-drivers/touch-input.md](./docs/04-drivers/touch-input.md)
 - [docs/04-drivers/uart-debug.md](./docs/04-drivers/uart-debug.md)
 
-## 6) Path Notes
+## 7) Path Notes
 
 Some files in this repository still contain absolute Windows paths.
 
@@ -264,7 +299,7 @@ Practical note:
 - `CMakeLists.txt` contains Windows default search paths for `STM32_Programmer_CLI`
 - the `.vgdbcmake` files contain debugger startup commands with absolute local build paths
 
-## 7) File Responsibilities
+## 8) File Responsibilities
 
 | File | Responsibility |
 |---|---|
@@ -275,12 +310,14 @@ Practical note:
 | `coffee_machine/coffee_machine_board.hpp/.cpp` | Board bootstrap, LTDC test path, SDRAM validation, UART logging, fatal handling. |
 | `coffee_machine/coffee_machine_simulation.hpp/.cpp` | Handwritten brewing-domain simulation used by TouchGFX. |
 | `coffee_machine/countdown_formatter.hpp/.cpp` | Formatting helper for brewing countdown text. |
+| `tests/CMakeLists.txt` | Host-side GoogleTest / gMock configuration for unit tests. |
+| `tests/unit/...` | Handwritten host-side unit tests for the handwritten app, model, simulation, and presenters. |
 | `TouchGFX/gui/src/...` | Handwritten TouchGFX views, presenters, model logic. |
 | `TouchGFX/generated/...` | Generated TouchGFX code; regenerate with care. |
 | `Drivers/BSP/STM32H750B-DK/...` | Board-level QSPI, SDRAM, LTDC, and touch support. |
 | `tools/visualgdb/...` | VisualGDB profile support files for validated debug workflows. |
 
-## 8) Recommended Reading Order
+## 9) Recommended Reading Order
 
 If you are new to the project, this reading order works well:
 
@@ -291,6 +328,7 @@ If you are new to the project, this reading order works well:
 5. [docs/05-artifacts/README.md](./docs/05-artifacts/README.md)
 6. [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
 7. [docs/07-testing/README.md](./docs/07-testing/README.md)
+8. [docs/08-tester-guide/README.md](./docs/08-tester-guide/README.md)
 
 ## License
 

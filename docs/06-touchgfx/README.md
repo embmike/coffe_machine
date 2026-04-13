@@ -111,6 +111,11 @@ Important current behavior:
 - notifies presenters when session data changes
 - delays the return to the selection screen by `APP_BREWING_DONE_HOLD_MS`
 
+Current test seam:
+
+- `Model` accepts an optional `ITick_Source`
+- presenter-facing model access is available through `IModel`
+
 ### 4. Domain simulation
 
 The demonstrator state machine lives outside TouchGFX in:
@@ -170,6 +175,25 @@ Why this split matters:
 - brewing timing stays testable outside the UI
 - simulator and board runtime use the same brewing logic
 - future migration from demonstrator logic to real machine state stays possible
+
+## Unit-Test Seams
+
+The handwritten TouchGFX-side logic now includes a few intentionally small interfaces that support host-side unit tests without dragging in full screen objects or runtime startup.
+
+Current interfaces:
+
+- [TouchGFX/gui/include/gui/model/ModelInterfaces.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/model/ModelInterfaces.hpp)
+- [TouchGFX/gui/include/gui/brewing_screen_screen/IBrewing_View.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/brewing_screen_screen/IBrewing_View.hpp)
+- [TouchGFX/gui/include/gui/slection_screen_screen/ISelection_View.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/slection_screen_screen/ISelection_View.hpp)
+- [TouchGFX/gui/include/gui/splash_screen_screen/ISplash_View.hpp](C:/st_apps/coffee_machine/TouchGFX/gui/include/gui/splash_screen_screen/ISplash_View.hpp)
+
+Practical purpose:
+
+- `ITick_Source` makes model timing deterministic in host tests
+- `IModel` gives presenters a narrow model contract
+- `IBrewing_View`, `ISelection_View`, and `ISplash_View` let presenter tests run without real TouchGFX screen instances
+
+The concrete screen classes still exist and still own the real UI behavior. These interfaces are intentionally narrow and only keep the handwritten logic testable.
 
 ### 5. Touch controller adapter
 
@@ -338,6 +362,7 @@ Current simulator-specific behavior:
 - `Model.cpp` uses a `std::chrono::steady_clock` tick source when `SIMULATOR` is defined
 - simulator logging uses `std::printf()`
 - board builds use `HAL_GetTick()` and `AppDebugLog()`
+- unit tests inject `ITick_Source` and avoid HAL and simulator dependencies entirely
 
 This gives the same high-level UI behavior in:
 
@@ -419,6 +444,7 @@ From the current state, the strongest next TouchGFX tasks are:
 - decide whether the demonstrator stays purely simulated or begins to map onto real machine control states
 - tighten naming inconsistencies such as `slection_screen` only if the rename cost is worth the churn
 - document any future Designer conventions before the UI grows further
+- extend presenter and model tests only when new handwritten behavior is added
 
 ## Satisfaction Check
 
