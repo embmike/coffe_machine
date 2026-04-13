@@ -212,6 +212,8 @@ The developer documentation is split by responsibility and workflow:
   - developer-facing outputs and internal helper artifacts
 - [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
   - TouchGFX flow, model/presenter ownership, simulation contract, UI assets
+- [docs/07-testing/README.md](./docs/07-testing/README.md)
+  - unit-test scope, MVP-aligned test strategy, naming rules, Doxygen rules, rollout plan
 
 ### Driver chapters
 
@@ -288,6 +290,7 @@ If you are new to the project, this reading order works well:
 4. [docs/04-drivers/README.md](./docs/04-drivers/README.md)
 5. [docs/05-artifacts/README.md](./docs/05-artifacts/README.md)
 6. [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
+7. [docs/07-testing/README.md](./docs/07-testing/README.md)
 
 ## License
 
