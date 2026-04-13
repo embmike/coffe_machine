@@ -648,6 +648,10 @@ Expected result:
 - the tests execute on the PC
 - no board is required
 
+Test explorer result:
+
+<img src="https://github.com/embmike/coffe_machine/blob/main/Images/unittest_testexplorer_success.jpg" alt="Test explorer result" width="50%" />
+  
 ## Rollout Status
 
 The original rollout order has progressed as follows:
