@@ -7,12 +7,13 @@
 #define BREWING_SCREENVIEW_HPP
 
 #include "coffee_machine_simulation.hpp"
+#include <gui/brewing_screen_screen/IBrewing_View.hpp>
 #include <gui_generated/brewing_screen_screen/brewing_screenViewBase.hpp>
 #include <gui/brewing_screen_screen/brewing_screenPresenter.hpp>
 #include <touchgfx/Unicode.hpp>
 #include <touchgfx/widgets/TextAreaWithWildcard.hpp>
 
-class brewing_screenView : public brewing_screenViewBase
+class brewing_screenView : public brewing_screenViewBase, public IBrewing_View
 {
 public:
     /**
@@ -40,7 +41,18 @@ public:
      * @brief Applies a new brewing session snapshot to the screen.
      * @param session Current brewing session state.
      */
+    void Update_Session(const BrewingSession& session) override;
+
+    /**
+     * @brief Applies a new brewing session snapshot to the screen.
+     * @param session Current brewing session state.
+     */
     void updateSession(const BrewingSession& session);
+
+    /**
+     * @brief Returns to the selection screen after brewing completes.
+     */
+    void Handle_Brewing_Completed() override;
 
     /**
      * @brief Returns to the selection screen after brewing completes.

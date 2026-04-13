@@ -1,7 +1,6 @@
-#include <gui/splash_screen_screen/splash_screenView.hpp>
 #include <gui/splash_screen_screen/splash_screenPresenter.hpp>
 
-splash_screenPresenter::splash_screenPresenter(splash_screenView& v)
+splash_screenPresenter::splash_screenPresenter(ISplash_View& v)
     : view(v)
 {
 

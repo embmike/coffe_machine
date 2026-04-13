@@ -1,7 +1,6 @@
-#include <gui/brewing_screen_screen/brewing_screenView.hpp>
 #include <gui/brewing_screen_screen/brewing_screenPresenter.hpp>
 
-brewing_screenPresenter::brewing_screenPresenter(brewing_screenView& v)
+brewing_screenPresenter::brewing_screenPresenter(IBrewing_View& v)
    : view(v)
 {
 
@@ -11,7 +10,7 @@ void brewing_screenPresenter::activate()
 {
    if (model != 0)
    {
-      view.updateSession(model->getBrewingSession());
+      view.Update_Session(model->Get_Brewing_Session());
    }
 }
 
@@ -22,10 +21,10 @@ void brewing_screenPresenter::deactivate()
 
 void brewing_screenPresenter::onBrewingSessionUpdated(const BrewingSession& session)
 {
-   view.updateSession(session);
+   view.Update_Session(session);
 }
 
 void brewing_screenPresenter::onBrewingSessionCompleted()
 {
-   view.handleBrewingCompleted();
+   view.Handle_Brewing_Completed();
 }

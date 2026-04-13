@@ -1,7 +1,7 @@
 #ifndef MODELLISTENER_HPP
 #define MODELLISTENER_HPP
 
-#include <gui/model/Model.hpp>
+#include <gui/model/ModelInterfaces.hpp>
 
 class ModelListener
 {
@@ -11,7 +11,7 @@ public:
     
    virtual ~ModelListener() {}
 
-   void bind(Model* m)
+   void bind(IModel* m)
    {
       model = m;
    }
@@ -25,7 +25,7 @@ public:
    {
    }
 protected:
-   Model* model;
+   IModel* model;
 };
 
 #endif // MODELLISTENER_HPP

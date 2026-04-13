@@ -6,11 +6,13 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
+#include <gui/model/ModelInterfaces.hpp>
+
 #include "coffee_machine_simulation.hpp"
 
 class ModelListener;
 
-class Model
+class Model : public IModel
 {
 public:
     /**
@@ -28,6 +30,18 @@ public:
     }
 
     /**
+     * @brief Sets an optional external tick source.
+     * @param tick_source Tick source used by tick().
+     */
+    void Set_Tick_Source(ITick_Source* tick_source);
+
+    /**
+     * @brief Starts a brewing session for the selected drink.
+     * @param type Selected drink type.
+     */
+    void Start_Brewing(CoffeeType type) override;
+
+    /**
      * @brief Starts a brewing session for the selected drink.
      * @param type Selected drink type.
      */
@@ -37,6 +51,12 @@ public:
      * @brief Advances the application model by one UI tick.
      */
     void tick();
+
+    /**
+     * @brief Returns the current brewing session snapshot.
+     * @return Active brewing session state.
+     */
+    const BrewingSession& Get_Brewing_Session() const override;
 
     /**
      * @brief Returns the current brewing session snapshot.
@@ -59,6 +79,7 @@ private:
     void notifyBrewingSessionUpdated();
 
     CoffeeMachineSimulation simulation_; ///< Brewing-domain state machine.
+    ITick_Source* tick_source_;          ///< Optional external tick source for unit tests.
     uint32_t last_tick_ms_;              ///< Last tick timestamp used for delta calculation.
     uint32_t done_hold_ms_;              ///< Post-completion hold time before returning to selection.
     bool completion_notified_;           ///< Guards one-shot completion notification.

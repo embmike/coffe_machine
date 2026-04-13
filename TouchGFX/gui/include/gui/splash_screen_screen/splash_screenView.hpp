@@ -1,10 +1,11 @@
 #ifndef SPLASH_SCREENVIEW_HPP
 #define SPLASH_SCREENVIEW_HPP
 
+#include <gui/splash_screen_screen/ISplash_View.hpp>
 #include <gui_generated/splash_screen_screen/splash_screenViewBase.hpp>
 #include <gui/splash_screen_screen/splash_screenPresenter.hpp>
 
-class splash_screenView : public splash_screenViewBase
+class splash_screenView : public splash_screenViewBase, public ISplash_View
 {
 public:
    splash_screenView();

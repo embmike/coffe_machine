@@ -1,17 +1,16 @@
 #ifndef SLECTION_SCREENPRESENTER_HPP
 #define SLECTION_SCREENPRESENTER_HPP
 
+#include <gui/slection_screen_screen/ISelection_View.hpp>
 #include <gui/model/ModelListener.hpp>
 #include <mvp/Presenter.hpp>
 
 using namespace touchgfx;
 
-class slection_screenView;
-
 class slection_screenPresenter : public touchgfx::Presenter, public ModelListener
 {
 public:
-   slection_screenPresenter(slection_screenView& v);
+   slection_screenPresenter(ISelection_View& v);
 
    /**
     * The activate function is called automatically when this screen is "switched in"
@@ -32,7 +31,7 @@ public:
 private:
    slection_screenPresenter();
 
-   slection_screenView& view;
+   ISelection_View& view;
 };
 
 #endif // SLECTION_SCREENPRESENTER_HPP

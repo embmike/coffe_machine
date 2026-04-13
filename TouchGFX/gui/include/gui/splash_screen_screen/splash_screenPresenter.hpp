@@ -1,17 +1,16 @@
 #ifndef SPLASH_SCREENPRESENTER_HPP
 #define SPLASH_SCREENPRESENTER_HPP
 
+#include <gui/splash_screen_screen/ISplash_View.hpp>
 #include <gui/model/ModelListener.hpp>
 #include <mvp/Presenter.hpp>
 
 using namespace touchgfx;
 
-class splash_screenView;
-
 class splash_screenPresenter : public touchgfx::Presenter, public ModelListener
 {
 public:
-    splash_screenPresenter(splash_screenView& v);
+    splash_screenPresenter(ISplash_View& v);
 
     /**
      * The activate function is called automatically when this screen is "switched in"
@@ -30,7 +29,7 @@ public:
 private:
     splash_screenPresenter();
 
-    splash_screenView& view;
+    ISplash_View& view;
 };
 
 #endif // SPLASH_SCREENPRESENTER_HPP

@@ -2,10 +2,12 @@
 #include <gui/model/ModelListener.hpp>
 #include "app_config.h"
 
-#ifdef SIMULATOR
+#if defined(SIMULATOR) || defined(UNIT_TEST)
 #include <chrono>
 #include <cstdio>
-#else
+#endif
+
+#if !defined(SIMULATOR) && !defined(UNIT_TEST)
 #include "main.h"
 #endif
 
@@ -19,8 +21,21 @@ uint32_t get_app_tick_ms()
     const auto now = clock::now();
     return static_cast<uint32_t>(
         std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count());
+#elif defined(UNIT_TEST)
+    return 0U;
 #else
     return HAL_GetTick();
+#endif
+}
+
+void log_selected_coffee(CoffeeType type)
+{
+#ifdef SIMULATOR
+    std::printf("TouchGFX event: %s selected\r\n", CoffeeMachine_GetCoffeeLogName(type));
+#elif defined(UNIT_TEST)
+    (void)type;
+#else
+    AppDebugLog("TouchGFX event: %s selected\r\n", CoffeeMachine_GetCoffeeLogName(type));
 #endif
 }
 
@@ -29,6 +44,7 @@ uint32_t get_app_tick_ms()
 Model::Model()
     : modelListener(0),
       simulation_(),
+      tick_source_(0),
       last_tick_ms_(0U),
       done_hold_ms_(0U),
       completion_notified_(false)
@@ -36,22 +52,28 @@ Model::Model()
 
 }
 
-void Model::startBrewing(CoffeeType type)
+void Model::Set_Tick_Source(ITick_Source* tick_source)
+{
+    tick_source_ = tick_source;
+}
+
+void Model::Start_Brewing(CoffeeType type)
 {
     simulation_.start(type);
     done_hold_ms_ = 0U;
     completion_notified_ = false;
-#ifdef SIMULATOR
-    std::printf("TouchGFX event: %s selected\r\n", CoffeeMachine_GetCoffeeLogName(type));
-#else
-    AppDebugLog("TouchGFX event: %s selected\r\n", CoffeeMachine_GetCoffeeLogName(type));
-#endif
+    log_selected_coffee(type);
     notifyBrewingSessionUpdated();
+}
+
+void Model::startBrewing(CoffeeType type)
+{
+    Start_Brewing(type);
 }
 
 void Model::tick()
 {
-    const uint32_t now = get_app_tick_ms();
+    const uint32_t now = (tick_source_ != 0) ? tick_source_->Now_Ms() : get_app_tick_ms();
 
     if (last_tick_ms_ == 0U)
     {
@@ -85,9 +107,14 @@ void Model::tick()
     }
 }
 
-const BrewingSession& Model::getBrewingSession() const
+const BrewingSession& Model::Get_Brewing_Session() const
 {
     return simulation_.getSession();
+}
+
+const BrewingSession& Model::getBrewingSession() const
+{
+    return Get_Brewing_Session();
 }
 
 bool Model::isBrewingActive() const

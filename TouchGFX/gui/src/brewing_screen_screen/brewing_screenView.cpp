@@ -140,9 +140,19 @@ void brewing_screenView::updateSession(const BrewingSession& session)
     updateBrewingPhase(session);
 }
 
+void brewing_screenView::Update_Session(const BrewingSession& session)
+{
+    updateSession(session);
+}
+
 void brewing_screenView::handleBrewingCompleted()
 {
     application().gotoslection_screenScreenNoTransition();
+}
+
+void brewing_screenView::Handle_Brewing_Completed()
+{
+    handleBrewingCompleted();
 }
 
 void brewing_screenView::updateTexts(const BrewingSession& session)

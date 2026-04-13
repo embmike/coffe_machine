@@ -1,11 +1,12 @@
 #ifndef SLECTION_SCREENVIEW_HPP
 #define SLECTION_SCREENVIEW_HPP
 
+#include <gui/slection_screen_screen/ISelection_View.hpp>
 #include <gui_generated/slection_screen_screen/slection_screenViewBase.hpp>
 #include <gui/slection_screen_screen/slection_screenPresenter.hpp>
 #include <touchgfx/Callback.hpp>
 
-class slection_screenView : public slection_screenViewBase
+class slection_screenView : public slection_screenViewBase, public ISelection_View
 {
 public:
    slection_screenView();
