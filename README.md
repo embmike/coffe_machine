@@ -42,20 +42,20 @@ The current demonstrator flow is:
 
 <img src="https://github.com/embmike/coffe_machine/blob/main/Images/splash_screen.jpeg" alt="Splash screen screenshot" width="30%" />
 
-3. automatic transition after `5 s`
+2. automatic transition after `5 s`
 
-5. selection screen
+3. selection screen
 <img src="https://github.com/embmike/coffe_machine/blob/main/Images/selection_screen.jpeg" alt="Selection screen screenshot" width="30%" />
 
-6. touch-based drink selection
+4. touch-based drink selection
 
 <img src="https://github.com/embmike/coffe_machine/blob/main/Images/choose_a_coffee.jpeg" alt="Selection a coffe screen screenshot" width="30%" />
 
-8. brewing screen with progress, countdown, pouring animation, and steam animation
+5. brewing screen with progress, countdown, pouring animation, and steam animation
 
 <img src="https://github.com/embmike/coffe_machine/blob/main/Images/brewing_screen.jpeg" alt="Brewing screenshot" width="30%" />
 
-10. automatic return to the selection screen
+6. automatic return to the selection screen
 
 Current drink variants:
 
@@ -129,9 +129,11 @@ Recommended starting points:
   - [docs/03-debugging/README.md](./docs/03-debugging/README.md)
   - [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
   - [docs/07-testing/README.md](./docs/07-testing/README.md)
+  - [docs/08-unit-testing/README.md](./docs/08-unit-testing/README.md)
 - tester
   - [docs/07-testing/README.md](./docs/07-testing/README.md)
-  - [docs/08-system-testing/README.md](./docs/08-system-testing/README.md)
+  - [docs/08-unit-testing/README.md](./docs/08-unit-testing/README.md)
+  - [docs/09-system-testing/README.md](./docs/09-system-testing/README.md)
 
 ## 5) Development Environment
 
@@ -280,9 +282,11 @@ The developer documentation is split by responsibility and workflow:
 - [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
   - TouchGFX flow, model/presenter ownership, simulation contract, UI assets
 - [docs/07-testing/README.md](./docs/07-testing/README.md)
-  - unit-test scope, MVP-aligned test strategy, naming rules, Doxygen rules, Test Explorer usage, and role-specific guidance
-- [docs/08-system-testing/README.md](./docs/08-system-testing/README.md)
-  - Python-based board-side scenario test strategy, UART test API, harness design, and rollout plan
+  - testing overview, layer strategy, and reading order
+- [docs/08-unit-testing/README.md](./docs/08-unit-testing/README.md)
+  - unit-test scope, MVP-aligned unit-test strategy, naming rules, Doxygen rules, Test Explorer usage, and role-specific guidance
+- [docs/09-system-testing/README.md](./docs/09-system-testing/README.md)
+  - Python-based board-side scenario test strategy, USB-CDC test channel, harness design, and rollout plan
 
 ### Driver chapters
 
@@ -291,6 +295,7 @@ The developer documentation is split by responsibility and workflow:
 - [docs/04-drivers/ltdc-display.md](./docs/04-drivers/ltdc-display.md)
 - [docs/04-drivers/touch-input.md](./docs/04-drivers/touch-input.md)
 - [docs/04-drivers/uart-debug.md](./docs/04-drivers/uart-debug.md)
+- [docs/04-drivers/usb-cdc-com.md](./docs/04-drivers/usb-cdc-com.md)
 
 ## 8) Path Notes
 
@@ -362,7 +367,8 @@ If you are new to the project, this reading order works well:
 5. [docs/05-artifacts/README.md](./docs/05-artifacts/README.md)
 6. [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
 7. [docs/07-testing/README.md](./docs/07-testing/README.md)
-8. [docs/08-system-testing/README.md](./docs/08-system-testing/README.md)
+8. [docs/08-unit-testing/README.md](./docs/08-unit-testing/README.md)
+9. [docs/09-system-testing/README.md](./docs/09-system-testing/README.md)
 
 ## License
 

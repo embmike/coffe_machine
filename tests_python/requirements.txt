@@ -1,0 +1,4 @@
+pytest
+pyserial
+pytest-timeout
+pytest-html

@@ -4,7 +4,31 @@
 
 Describe the strategy for Python-based board-side system tests that verify user-visible application scenarios on real hardware.
 
-This chapter is the planning and implementation guide for the next test layer after host-side unit tests.
+This chapter describes the implemented board-side system-test layer and its intended direction for the next steps.
+
+## Current Status
+
+The first implementation slice is now prepared in the code base:
+
+- Python harness scaffold in `tests_python/...`
+- documented command contract for the board-side test channel
+- handwritten board-side test facade in `coffee_machine/app_test_api.*`
+- handwritten USB-CDC command channel in `coffee_machine/app_test_channel.*`
+
+Current implemented command set:
+
+- `get_version`
+- `get_state`
+- `get_session`
+- `reset_demo`
+- `select_drink`
+- `reboot_board`
+
+Current intent of the current slice:
+
+- keep the command set small
+- keep the parser handwritten and understandable
+- verify the end-to-end path before broadening the protocol
 
 ## Purpose
 
@@ -29,11 +53,11 @@ In short:
 This chapter covers:
 
 - the intended test level
-- the proposed Python technology stack
-- the recommended board-side test interface
-- the proposed UART protocol style
+- the Python technology stack
+- the board-side test interface
+- the command protocol style
 - the Python harness structure
-- the first planned system-test scenarios
+- the current system-test scenarios
 - the rollout order
 
 This chapter does not define:
@@ -45,9 +69,10 @@ This chapter does not define:
 
 For those topics, continue with:
 
-- [docs/07-testing/README.md](C:/st_apps/coffee_machine/docs/07-testing/README.md)
+- [docs/08-unit-testing/README.md](C:/st_apps/coffee_machine/docs/08-unit-testing/README.md)
 - [docs/04-drivers/touch-input.md](C:/st_apps/coffee_machine/docs/04-drivers/touch-input.md)
 - [docs/04-drivers/uart-debug.md](C:/st_apps/coffee_machine/docs/04-drivers/uart-debug.md)
+- [docs/04-drivers/usb-cdc-com.md](C:/st_apps/coffee_machine/docs/04-drivers/usb-cdc-com.md)
 
 ## Test Level
 
@@ -109,7 +134,7 @@ The recommended technical path is:
 ```text
 pytest
   -> pyserial
-    -> UART transport
+    -> USB CDC / COM transport
       -> board command parser
         -> app test facade
           -> application / model action
@@ -128,7 +153,7 @@ The board should expose a small handwritten test interface.
 
 Recommended structure:
 
-### 1. UART transport layer
+### 1. USB CDC / COM transport layer
 
 Responsibilities:
 
@@ -210,7 +235,7 @@ The first form is:
 
 The recommended protocol is:
 
-- JSON Lines over UART
+- JSON Lines over the USB-CDC command channel
 
 That means:
 
@@ -240,6 +265,9 @@ Example response:
 ```json
 {"status":"ok","state":"brewing"}
 ```
+
+For the current implementation slice, the board parser is intentionally small and handwritten.
+It is designed for the canonical JSON emitted by the Python harness, not as a general-purpose JSON parser.
 
 ## Why JSON Lines Fit This Project
 
@@ -285,6 +313,130 @@ Recommended examples:
 {"cmd":"select_drink","drink":"espresso"}
 {"cmd":"get_session"}
 ```
+
+## Concrete First API Contract
+
+The first implementation should use the following concrete command names and payloads.
+
+### `reset_demo`
+
+Request:
+
+```json
+{"cmd":"reset_demo"}
+```
+
+Success response:
+
+```json
+{"status":"ok"}
+```
+
+Meaning:
+
+- return the demonstrator to a defined start state for testing
+
+### `get_state`
+
+Request:
+
+```json
+{"cmd":"get_state"}
+```
+
+Success response:
+
+```json
+{"status":"ok","state":"selection"}
+```
+
+Allowed first-version states:
+
+- `splash`
+- `selection`
+- `brewing`
+
+### `select_drink`
+
+Request:
+
+```json
+{"cmd":"select_drink","drink":"espresso"}
+```
+
+Allowed first-version drink values:
+
+- `espresso`
+- `cappuccino`
+- `latte`
+- `americano`
+
+Success response:
+
+```json
+{"status":"ok"}
+```
+
+Typical semantic error:
+
+```json
+{"status":"error","reason":"invalid_state_for_selection"}
+```
+
+### `get_session`
+
+Request:
+
+```json
+{"cmd":"get_session"}
+```
+
+Success response:
+
+```json
+{
+  "status":"ok",
+  "active":true,
+  "coffee":"espresso",
+  "phase":"start",
+  "progress":0,
+  "remaining_ms":25000
+}
+```
+
+Recommended first session fields:
+
+- `active`
+- `coffee`
+- `phase`
+- `progress`
+- `remaining_ms`
+
+Recommended first phase values:
+
+- `idle`
+- `start`
+- `brewing`
+- `finishing`
+- `done`
+
+### `get_version`
+
+Request:
+
+```json
+{"cmd":"get_version"}
+```
+
+Success response:
+
+```json
+{"status":"ok","version":"coffee_machine-systemtest-v1"}
+```
+
+Purpose:
+
+- prove that the board speaks the expected test protocol version
 
 ## Recommended Response Shape
 
@@ -335,6 +487,32 @@ Those fields map naturally to the current demonstrator and brewing-domain model 
 - [docs/06-touchgfx/README.md](C:/st_apps/coffee_machine/docs/06-touchgfx/README.md)
 - [coffee_machine/coffee_machine_simulation.hpp](C:/st_apps/coffee_machine/coffee_machine/coffee_machine_simulation.hpp)
 
+## Current Suggested Implementation Boundary
+
+The first board-side implementation should introduce a small handwritten seam such as:
+
+- `coffee_machine/app_test_api.hpp`
+- `coffee_machine/app_test_api.cpp`
+- `coffee_machine/app_test_channel.h`
+- `coffee_machine/app_test_channel.cpp`
+
+Suggested responsibilities:
+
+- `app_test_api`
+  - semantic actions
+  - visible app state
+  - brewing-session snapshot
+- `app_test_channel`
+  - USB-CDC line buffering
+  - JSON request parsing
+  - JSON response serialization
+
+That keeps the implementation aligned with the existing handwritten ownership in:
+
+- [coffee_machine](C:/st_apps/coffee_machine/coffee_machine)
+- [TouchGFX/gui/src/model/Model.cpp](C:/st_apps/coffee_machine/TouchGFX/gui/src/model/Model.cpp)
+- [TouchGFX/gui/src/common/FrontendApplication.cpp](C:/st_apps/coffee_machine/TouchGFX/gui/src/common/FrontendApplication.cpp)
+
 ## Python Technology Stack
 
 Recommended core stack:
@@ -350,7 +528,7 @@ Recommended optional additions:
 Why:
 
 - `pytest` gives readable tests, fixtures, and good tooling
-- `pyserial` is the standard UART transport on the PC side
+- `pyserial` is the standard serial transport on the PC side
 - `pytest-timeout` helps with hangs
 - `pytest-html` provides human-readable reports
 
@@ -407,7 +585,40 @@ Recommended responsibilities:
   - `get_session()`
   - `wait_until_state()`
 
+The harness should also tolerate non-JSON startup log lines on the same UART and keep reading until the next valid JSON response is received or the timeout expires.
+
 That keeps the tests short and readable.
+
+## Documentation Rules For Python System Tests
+
+The Python-based system tests should follow the same documentation idea as the C++ unit tests:
+
+- each test should state its test goal
+- each test should state the expected behavior
+- naming should stay readable and explicit
+
+Recommended practical form:
+
+- one short module docstring at the top of the file
+- one short docstring directly inside each test function
+
+Recommended example:
+
+```python
+def test_select_espresso_starts_brewing(board) -> None:
+    """
+    Test goal:
+    - verify that selecting Espresso starts the brewing flow
+
+    Expected behavior:
+    - the board enters the brewing state
+    - the active coffee is espresso
+    """
+```
+
+This keeps the Python system tests aligned with the documentation style already used for:
+
+- [docs/08-unit-testing/README.md](C:/st_apps/coffee_machine/docs/08-unit-testing/README.md)
 
 ## Result Model For Each Test
 
@@ -529,13 +740,59 @@ That gives:
 - easy local inspection
 - future CI compatibility
 
+## Execution Path
+
+Python-based board-side system tests are intentionally executed through the shell path only.
+
+### Shell
+
+Recommended smoke-test entry point:
+
+```powershell
+python tests_python/run_pytest.py --port COM5 --suite smoke
+```
+
+Recommended full current suite:
+
+```powershell
+python tests_python/run_pytest.py --port COM5 --suite all
+```
+
+Each launcher run writes a timestamped test report set to `tests_python/reports/`:
+
+- one JUnit XML report for archival or tooling
+- one HTML report for manual review when `pytest-html` is installed
+
+An alternative report directory can be provided with `--report-dir`.
+
+Direct `pytest` use remains valid:
+
+```powershell
+pytest tests_python/tests/test_smoke.py --board-port COM5
+```
+
+This keeps the tester workflow simple:
+
+- one launcher script
+- one visible command line
+- one place to collect logs and reports
+
+Recommended first use:
+
+- flash the current firmware to the board
+- connect the USB cable to `CN13`
+- confirm that the board appears as a COM port on the host
+- close other tools that may still hold the same COM port
+- run `python tests_python/run_pytest.py --port COM5 --suite smoke`
+- only then continue with the broader system-test suite
+
 ## Rollout Order
 
 The recommended rollout order is:
 
 1. define the board-side command set
 2. define the visible state model
-3. implement the UART parser and app test facade on the board
+3. implement the command parser and app test facade on the board
 4. create the Python environment
 5. implement the Python harness
 6. add the first smoke test

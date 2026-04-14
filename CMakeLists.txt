@@ -4,6 +4,7 @@ project(coffee_machine LANGUAGES C CXX ASM)
 
 option(ENABLE_EMBEDDED_TARGETS "Build embedded bootloader and application targets" ON)
 option(ENABLE_UNIT_TESTS "Build host-side unit tests" OFF)
+option(ENABLE_SYSTEM_TEST_CHANNEL "Build board-side USB-CDC system-test channel" ON)
 
 set(TOUCHGFX_ROOT ${CMAKE_CURRENT_LIST_DIR}/Middlewares/ST/touchgfx)
 set(TOUCHGFX_LIB ${TOUCHGFX_ROOT}/lib/core/cortex_m7/gcc/libtouchgfx-float-abi-hard.a)
@@ -51,6 +52,14 @@ set(APP_SUPPORT_HEADERS
 	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/coffee_machine_simulation.hpp
 	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/countdown_formatter.hpp)
 
+set(SYSTEM_TEST_SOURCES
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/app_test_api.cpp
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/app_test_channel.cpp)
+
+set(SYSTEM_TEST_HEADERS
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/app_test_api.hpp
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/app_test_channel.h)
+
 set(EXTMEM_BOOT_SOURCES
 	${CMAKE_CURRENT_LIST_DIR}/ExtMem_Boot/Src/fmc.c
 	${CMAKE_CURRENT_LIST_DIR}/ExtMem_Boot/Src/main.c
@@ -85,6 +94,10 @@ if(ENABLE_EMBEDDED_TARGETS)
 		GENERATE_MAP)
 
 	if(TARGET BSP)
+		if(ENABLE_SYSTEM_TEST_CHANNEL)
+			target_compile_definitions(BSP PRIVATE APP_SYSTEM_TEST_ENABLED=1)
+		endif()
+
 		target_include_directories(BSP PRIVATE
 			${TOUCHGFX_ROOT}/framework/include
 			${CMAKE_CURRENT_LIST_DIR}/TouchGFX/gui/include
@@ -106,10 +119,20 @@ if(ENABLE_EMBEDDED_TARGETS)
 			${APP_SUPPORT_SOURCES}
 			${APP_SUPPORT_HEADERS})
 
+		if(ENABLE_SYSTEM_TEST_CHANNEL)
+			target_sources(BSP PRIVATE
+				${SYSTEM_TEST_SOURCES}
+				${SYSTEM_TEST_HEADERS})
+		endif()
+
 		get_target_property(BSP_SOURCES BSP SOURCES)
 		if(BSP_SOURCES)
+			list(FILTER BSP_SOURCES EXCLUDE REGEX ".*/Core/Src/main\\.c$")
 			list(FILTER BSP_SOURCES EXCLUDE REGEX ".*/TouchGFX/generated/simulator/.*")
 			list(FILTER BSP_SOURCES EXCLUDE REGEX ".*/TouchGFX/simulator/.*")
+			list(FILTER BSP_SOURCES EXCLUDE REGEX ".*/Middlewares/ST/touchgfx/framework/source/platform/.*/simulator/.*")
+			list(FILTER BSP_SOURCES EXCLUDE REGEX ".*/Middlewares/ST/touchgfx/framework/source/platform/driver/touch/SDL2TouchController\\.cpp$")
+			list(FILTER BSP_SOURCES EXCLUDE REGEX ".*/Middlewares/ST/touchgfx/os/OSWrappers(_cmsis)?\\.cpp$")
 			set_property(TARGET BSP PROPERTY SOURCES "${BSP_SOURCES}")
 		endif()
 
@@ -119,6 +142,12 @@ if(ENABLE_EMBEDDED_TARGETS)
 		source_group(TREE ${CMAKE_CURRENT_LIST_DIR}/coffee_machine
 			PREFIX "Source Files\\coffee_machine"
 			FILES ${APP_SUPPORT_SOURCES})
+		source_group(TREE ${CMAKE_CURRENT_LIST_DIR}/coffee_machine
+			PREFIX "Header Files\\coffee_machine"
+			FILES ${SYSTEM_TEST_HEADERS})
+		source_group(TREE ${CMAKE_CURRENT_LIST_DIR}/coffee_machine
+			PREFIX "Source Files\\coffee_machine"
+			FILES ${SYSTEM_TEST_SOURCES})
 	endif()
 
 	target_link_libraries(coffee_machine PRIVATE

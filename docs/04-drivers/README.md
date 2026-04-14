@@ -12,13 +12,14 @@ This chapter is the map. The individual driver chapters contain the deeper imple
 
 ## Driver Areas
 
-The project currently depends on five driver areas for basic bring-up and UI interaction:
+The project currently depends on six driver areas for basic bring-up and UI interaction:
 
 - QSPI / External Flash / XIP
 - FMC / SDRAM
 - LTDC / Display
 - Touch / Input
 - UART / Debug Output
+- USB CDC / COM
 
 They do not operate independently. They form a startup chain.
 
@@ -48,6 +49,7 @@ The important point is:
 - LTDC can only show correct output if both SDRAM and framebuffer/cache behavior are correct
 - touch input can only work because the BSP FT5336 path and `I2C4` path are valid
 - UART helps explain where the system stopped before the display path is trustworthy
+- USB CDC provides the optional PC-to-board command path for system tests
 
 ## Subsystem Responsibilities
 
@@ -148,6 +150,24 @@ Detailed chapter:
 
 - [UART / Debug Output](./uart-debug.md)
 
+## USB CDC / COM
+
+This subsystem is responsible for:
+
+- exposing the optional board-side system-test command channel to the PC
+- enumerating as a COM port on the host
+- carrying Python-driven system-test commands over `CN13`
+
+Read this chapter first when the symptom is:
+
+- the board-side system tests cannot find or open the expected COM port
+- the port disappears after reset and you need to understand why
+- the firmware seems correct but the shell-based system tests still cannot talk to the board
+
+Detailed chapter:
+
+- [USB CDC / COM](./usb-cdc-com.md)
+
 ## Recommended Reading Order
 
 For a developer who is new to this codebase, the most useful order is:
@@ -158,6 +178,7 @@ For a developer who is new to this codebase, the most useful order is:
 4. [LTDC / Display](C:/st_apps/coffee_machine/docs/04-drivers/ltdc-display.md)
 5. [Touch / Input](C:/st_apps/coffee_machine/docs/04-drivers/touch-input.md)
 6. [UART / Debug Output](C:/st_apps/coffee_machine/docs/04-drivers/uart-debug.md)
+7. [USB CDC / COM](C:/st_apps/coffee_machine/docs/04-drivers/usb-cdc-com.md)
 
 Why this order:
 
@@ -167,6 +188,7 @@ Why this order:
 - then understand how the visible display path uses that memory
 - then understand how user input returns from the panel into TouchGFX
 - finally understand how UART helps diagnose everything else
+- then understand how the optional USB-CDC command path supports board-side system tests
 
 ## Symptom-To-Chapter Guide
 

@@ -48,6 +48,11 @@ public:
     void startBrewing(CoffeeType type);
 
     /**
+     * @brief Resets the demonstrator model to the idle state.
+     */
+    void Reset_Demo();
+
+    /**
      * @brief Advances the application model by one UI tick.
      */
     void tick();

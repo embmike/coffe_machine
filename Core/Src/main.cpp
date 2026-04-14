@@ -26,11 +26,15 @@ extern "C" {
 #include "memorymap.h"
 #include "quadspi.h"
 #include "usart.h"
+#include "usb_device.h"
 #include "gpio.h"
 #include "fmc.h"
 
    /* Private includes ----------------------------------------------------------*/
    /* USER CODE BEGIN Includes */
+#if defined(APP_SYSTEM_TEST_ENABLED)
+#include "app_test_channel.h"
+#endif
 } // extern "C"
 
 #include "coffee_machine_app.hpp"
@@ -123,6 +127,10 @@ int main(void)
    MX_USART3_UART_Init();
    MX_DMA2D_Init();
    MX_CRC_Init();
+   MX_I2C4_Init();
+#if defined(APP_SYSTEM_TEST_ENABLED)
+   MX_USB_DEVICE_Init();
+#endif
    /* USER CODE BEGIN 2 */
    if (CoffeeMachine_DisplayBootstrap() != HAL_OK)
    {
@@ -140,6 +148,9 @@ int main(void)
       /* USER CODE END WHILE */
 
       CoffeeMachine_AppProcess();
+#if defined(APP_SYSTEM_TEST_ENABLED)
+      AppTest_ChannelProcess();
+#endif
       /* USER CODE BEGIN 3 */
    }
    /* USER CODE END 3 */
@@ -167,8 +178,9 @@ void SystemClock_Config(void)
    /** Initializes the RCC Oscillators according to the specified parameters
    * in the RCC_OscInitTypeDef structure.
    */
-   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_HSE;
    RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
    RCC_OscInitStruct.PLL.PLLM = 5;
@@ -184,8 +196,8 @@ void SystemClock_Config(void)
       Error_Handler();
    }
 
-   /** Initializes the CPU, AHB and APB buses clocks
-   */
+    /** Initializes the CPU, AHB and APB buses clocks
+    */
    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
                                | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2
                                | RCC_CLOCKTYPE_D3PCLK1 | RCC_CLOCKTYPE_D1PCLK1;

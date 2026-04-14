@@ -1,4 +1,5 @@
 #include <gui/brewing_screen_screen/brewing_screenPresenter.hpp>
+#include "app_test_api.hpp"
 
 brewing_screenPresenter::brewing_screenPresenter(IBrewing_View& v)
    : view(v)
@@ -8,6 +9,7 @@ brewing_screenPresenter::brewing_screenPresenter(IBrewing_View& v)
 
 void brewing_screenPresenter::activate()
 {
+   AppTest_Set_State(AppTestState::Brewing);
    if (model != 0)
    {
       view.Update_Session(model->Get_Brewing_Session());

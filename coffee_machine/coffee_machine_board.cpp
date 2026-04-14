@@ -6,6 +6,11 @@ extern "C" {
 #include "gpio.h"
 #include "ltdc.h"
 #include "usart.h"
+#if defined(APP_SYSTEM_TEST_ENABLED)
+#include "usb_device.h"
+#include "usbd_cdc_if.h"
+extern USBD_HandleTypeDef hUsbDeviceFS;
+#endif
 }
 
 #include <cstdarg>
@@ -183,6 +188,28 @@ extern "C" HAL_StatusTypeDef AppDebugLog(const char* format, ...)
     {
         length = static_cast<int>(sizeof(buffer) - 1U);
     }
+
+#if defined(APP_SYSTEM_TEST_ENABLED)
+    if ((hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED) && (hUsbDeviceFS.pClassData != nullptr))
+    {
+        const uint32_t deadline = HAL_GetTick() + 100U;
+        while (HAL_GetTick() <= deadline)
+        {
+            const uint8_t result = CDC_Transmit_FS(reinterpret_cast<uint8_t*>(buffer), static_cast<uint16_t>(length));
+            if (result == USBD_OK)
+            {
+                return HAL_OK;
+            }
+
+            if (result != USBD_BUSY)
+            {
+                break;
+            }
+
+            HAL_Delay(1U);
+        }
+    }
+#endif
 
     return HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(buffer), static_cast<uint16_t>(length), 1000U);
 }

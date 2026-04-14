@@ -6,6 +6,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "app_test_api.hpp"
 #include <gui/brewing_screen_screen/IBrewing_View.hpp>
 #include <gui/brewing_screen_screen/brewing_screenPresenter.hpp>
 #include <gui/model/ModelInterfaces.hpp>
@@ -38,6 +39,7 @@ using ::testing::ReturnRef;
  * Expected behavior:
  * - the presenter requests the current session from the model
  * - the presenter forwards that session to the view
+ * - the observable app-test state becomes brewing
  */
 TEST(BrewingScreenPresenterTests, Activate_Updates_View_With_Current_Session)
 {
@@ -53,7 +55,10 @@ TEST(BrewingScreenPresenterTests, Activate_Updates_View_With_Current_Session)
     EXPECT_CALL(model, Get_Brewing_Session()).Times(Exactly(1)).WillOnce(ReturnRef(session));
     EXPECT_CALL(view, Update_Session(Ref(session))).Times(Exactly(1));
 
+    AppTest_Set_State(AppTestState::Selection);
     presenter.activate();
+
+    EXPECT_EQ(AppTest_Get_State(), AppTestState::Brewing);
 }
 
 /**

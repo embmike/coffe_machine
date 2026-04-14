@@ -46,6 +46,7 @@ target_include_directories(coffee_machine_unittest PRIVATE
 )
 
 target_sources(coffee_machine_unittest PRIVATE
+    ../coffee_machine/app_test_api.cpp
     ../coffee_machine/coffee_machine_app.cpp
     ../coffee_machine/countdown_formatter.cpp
     ../coffee_machine/coffee_machine_simulation.cpp

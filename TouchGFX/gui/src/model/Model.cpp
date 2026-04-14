@@ -1,6 +1,7 @@
 #include <gui/model/Model.hpp>
 #include <gui/model/ModelListener.hpp>
 #include "app_config.h"
+#include "app_test_api.hpp"
 
 #if defined(SIMULATOR) || defined(UNIT_TEST)
 #include <chrono>
@@ -49,7 +50,8 @@ Model::Model()
       done_hold_ms_(0U),
       completion_notified_(false)
 {
-
+    AppTest_Register_Model(this);
+    AppTest_Set_Session(simulation_.getSession());
 }
 
 void Model::Set_Tick_Source(ITick_Source* tick_source)
@@ -69,6 +71,15 @@ void Model::Start_Brewing(CoffeeType type)
 void Model::startBrewing(CoffeeType type)
 {
     Start_Brewing(type);
+}
+
+void Model::Reset_Demo()
+{
+    simulation_.reset();
+    done_hold_ms_ = 0U;
+    completion_notified_ = false;
+    last_tick_ms_ = 0U;
+    AppTest_Set_Session(simulation_.getSession());
 }
 
 void Model::tick()
@@ -103,6 +114,8 @@ void Model::tick()
                 modelListener->onBrewingSessionCompleted();
             }
             simulation_.stop();
+            AppTest_Set_State(AppTestState::Selection);
+            AppTest_Set_Session(simulation_.getSession());
         }
     }
 }
@@ -124,6 +137,7 @@ bool Model::isBrewingActive() const
 
 void Model::notifyBrewingSessionUpdated()
 {
+    AppTest_Set_Session(simulation_.getSession());
     if (modelListener != 0)
     {
         modelListener->onBrewingSessionUpdated(simulation_.getSession());

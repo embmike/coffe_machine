@@ -6,6 +6,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "app_test_api.hpp"
 #include <gui/model/ModelInterfaces.hpp>
 #include <gui/slection_screen_screen/ISelection_View.hpp>
 #include <gui/slection_screen_screen/slection_screenPresenter.hpp>
@@ -26,6 +27,23 @@ public:
 
 using ::testing::_;
 using ::testing::Exactly;
+
+/**
+ * @brief Test goal: Activating the presenter shall expose the selection state.
+ *
+ * Expected behavior:
+ * - the observable app-test state becomes selection
+ */
+TEST(SlectionScreenPresenterTests, Activate_Sets_App_Test_State_To_Selection)
+{
+    Dummy_Selection_View view;
+    slection_screenPresenter presenter(view);
+
+    AppTest_Set_State(AppTestState::Splash);
+    presenter.activate();
+
+    EXPECT_EQ(AppTest_Get_State(), AppTestState::Selection);
+}
 
 /**
  * @brief Test goal: The selected coffee type shall be forwarded to the model.

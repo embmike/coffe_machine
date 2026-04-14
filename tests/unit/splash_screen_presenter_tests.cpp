@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 
+#include "app_test_api.hpp"
 #include <gui/splash_screen_screen/ISplash_View.hpp>
 #include <gui/splash_screen_screen/splash_screenPresenter.hpp>
 
@@ -16,19 +17,20 @@ class Dummy_Splash_View : public ISplash_View
 }
 
 /**
- * @brief Test goal: Activating the splash presenter shall not cause side effects.
+ * @brief Test goal: Activating the splash presenter shall expose the splash state.
  *
  * Expected behavior:
- * - activate returns without error
+ * - the observable app-test state becomes splash
  */
-TEST(SplashScreenPresenterTests, Activate_Has_No_Side_Effect)
+TEST(SplashScreenPresenterTests, Activate_Sets_App_Test_State_To_Splash)
 {
     Dummy_Splash_View view;
     splash_screenPresenter presenter(view);
 
+    AppTest_Set_State(AppTestState::Selection);
     presenter.activate();
 
-    SUCCEED();
+    EXPECT_EQ(AppTest_Get_State(), AppTestState::Splash);
 }
 
 /**
