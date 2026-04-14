@@ -93,6 +93,10 @@ This chapter does not define:
 
 Those topics belong to later validation work outside the C++ unit-test layer.
 
+For the planned Python-based board-side scenario layer, continue with:
+
+- [docs/08-system-testing/README.md](C:/st_apps/coffee_machine/docs/08-system-testing/README.md)
+
 ## Test Strategy
 
 The project uses two complementary test layers:

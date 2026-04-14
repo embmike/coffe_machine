@@ -131,6 +131,7 @@ Recommended starting points:
   - [docs/07-testing/README.md](./docs/07-testing/README.md)
 - tester
   - [docs/07-testing/README.md](./docs/07-testing/README.md)
+  - [docs/08-system-testing/README.md](./docs/08-system-testing/README.md)
 
 ## 5) Development Environment
 
@@ -280,6 +281,8 @@ The developer documentation is split by responsibility and workflow:
   - TouchGFX flow, model/presenter ownership, simulation contract, UI assets
 - [docs/07-testing/README.md](./docs/07-testing/README.md)
   - unit-test scope, MVP-aligned test strategy, naming rules, Doxygen rules, Test Explorer usage, and role-specific guidance
+- [docs/08-system-testing/README.md](./docs/08-system-testing/README.md)
+  - Python-based board-side scenario test strategy, UART test API, harness design, and rollout plan
 
 ### Driver chapters
 
@@ -359,6 +362,7 @@ If you are new to the project, this reading order works well:
 5. [docs/05-artifacts/README.md](./docs/05-artifacts/README.md)
 6. [docs/06-touchgfx/README.md](./docs/06-touchgfx/README.md)
 7. [docs/07-testing/README.md](./docs/07-testing/README.md)
+8. [docs/08-system-testing/README.md](./docs/08-system-testing/README.md)
 
 ## License
 
