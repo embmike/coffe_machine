@@ -7,6 +7,7 @@ Coffee machine demonstrator for the **STM32H750B-DK** with:
 - framebuffer in external SDRAM
 - TouchGFX user interface with touch input
 - UART-based developer diagnostics
+- USB-CDC / COM system-test channel on `CN13`
 
 ## 1) What does the application do?
 
