@@ -10,17 +10,17 @@ using namespace touchgfx;
 class FrontendApplication : public FrontendApplicationBase
 {
 public:
-    FrontendApplication(Model& m, FrontendHeap& heap);
-    virtual ~FrontendApplication() { }
+   FrontendApplication(Model& m, FrontendHeap& heap);
+   virtual ~FrontendApplication() {}
 
-    void gotoslection_screenScreenNoTransition();
-    void gotobrewing_screenScreenNoTransition();
+   void gotoslection_screenScreenNoTransition();
+   void gotobrewing_screenScreenNoTransition();
 
-    virtual void handleTickEvent()
-    {
-        model.tick();
-        FrontendApplicationBase::handleTickEvent();
-    }
+   virtual void handleTickEvent()
+   {
+      model.tick();
+      FrontendApplicationBase::handleTickEvent();
+   }
 private:
 };
 
