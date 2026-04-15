@@ -152,10 +152,15 @@ In practice this means:
 
 - project generation and MCU configuration are maintained through STM32CubeMX
 - application and bootloader builds are driven through CMake / Ninja in VisualGDB
+- TouchGFX screen code must be generated through TouchGFX Designer before the embedded software build can succeed
 - host-side unit tests are configured through [tests/CMakeLists.txt](./tests/CMakeLists.txt)
 - the recommended Visual Studio Test Explorer entry point is a separate CMake workspace opened at [tests](./tests)
 - board flashing can happen through the VisualGDB flash targets or STM32CubeProgrammer
 - TouchGFX screens and generated GUI code are maintained through TouchGFX Designer
+
+Important practical prerequisite:
+
+- before building `coffee_machine`, open [TouchGFX/coffee_machine.touchgfx](C:/st_apps/coffee_machine/TouchGFX/coffee_machine.touchgfx) in TouchGFX Designer and generate the TouchGFX code for the screens
 
 If a different host setup is used, the most likely places that need attention are:
 

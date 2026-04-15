@@ -4,6 +4,21 @@
 
 Describe the current TouchGFX demonstrator state, show where the handwritten UI logic lives, and give a developer a safe re-entry path for further work.
 
+## Build Prerequisite
+
+TouchGFX Designer is a required development tool for this project.
+
+Before the embedded software build can succeed, the TouchGFX code for the screens must be generated from:
+
+- [TouchGFX/coffee_machine.touchgfx](C:/st_apps/coffee_machine/TouchGFX/coffee_machine.touchgfx)
+
+Practical rule:
+
+- first generate the TouchGFX code in TouchGFX Designer
+- then build the embedded software
+
+This is not an optional polish step. It is a build prerequisite.
+
 ## Current Status
 
 The TouchGFX application is no longer just a placeholder. The current demonstrator flow is implemented and running on the board.
@@ -396,6 +411,10 @@ So the preferred pattern is:
 - layout and IDs in TouchGFX Designer
 - business logic in handwritten view/presenter/model files
 - reusable non-UI logic in `coffee_machine/`
+
+Important generation rule:
+
+- when screen structure, assets, texts, or generated GUI bindings change, regenerate the TouchGFX code before building the embedded target
 
 ## What To Preserve During Regeneration
 

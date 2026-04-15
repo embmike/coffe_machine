@@ -22,6 +22,18 @@ For that path, use:
 
 - [docs/08-unit-testing/README.md](C:/st_apps/coffee_machine/docs/08-unit-testing/README.md)
 
+## Build Prerequisite
+
+Before the embedded application build can succeed, the TouchGFX screen code must already be generated.
+
+Required preparation:
+
+1. open [TouchGFX/coffee_machine.touchgfx](C:/st_apps/coffee_machine/TouchGFX/coffee_machine.touchgfx) in TouchGFX Designer
+2. generate the TouchGFX code
+3. then build `coffee_machine` in Visual Studio / VisualGDB
+
+Without that generation step, the repository may miss required generated GUI files even if the handwritten application code is correct.
+
 ## Build Configurations
 
 ### Debug
