@@ -52,12 +52,16 @@ set(APP_SUPPORT_HEADERS
 	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/coffee_machine_simulation.hpp
 	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/countdown_formatter.hpp)
 
-set(SYSTEM_TEST_SOURCES
-	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/app_test_api.cpp
+set(SYSTEM_TEST_API_SOURCES
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/app_test_api.cpp)
+
+set(SYSTEM_TEST_API_HEADERS
+	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/app_test_api.hpp)
+
+set(SYSTEM_TEST_CHANNEL_SOURCES
 	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/app_test_channel.cpp)
 
-set(SYSTEM_TEST_HEADERS
-	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/app_test_api.hpp
+set(SYSTEM_TEST_CHANNEL_HEADERS
 	${CMAKE_CURRENT_LIST_DIR}/coffee_machine/app_test_channel.h)
 
 set(EXTMEM_BOOT_SOURCES
@@ -117,12 +121,14 @@ if(ENABLE_EMBEDDED_TARGETS)
 			${TOUCHGFX_APP_SOURCES}
 			${BSP_DRIVER_SOURCES}
 			${APP_SUPPORT_SOURCES}
-			${APP_SUPPORT_HEADERS})
+			${APP_SUPPORT_HEADERS}
+			${SYSTEM_TEST_API_SOURCES}
+			${SYSTEM_TEST_API_HEADERS})
 
 		if(ENABLE_SYSTEM_TEST_CHANNEL)
 			target_sources(BSP PRIVATE
-				${SYSTEM_TEST_SOURCES}
-				${SYSTEM_TEST_HEADERS})
+				${SYSTEM_TEST_CHANNEL_SOURCES}
+				${SYSTEM_TEST_CHANNEL_HEADERS})
 		endif()
 
 		get_target_property(BSP_SOURCES BSP SOURCES)
@@ -144,10 +150,10 @@ if(ENABLE_EMBEDDED_TARGETS)
 			FILES ${APP_SUPPORT_SOURCES})
 		source_group(TREE ${CMAKE_CURRENT_LIST_DIR}/coffee_machine
 			PREFIX "Header Files\\coffee_machine"
-			FILES ${SYSTEM_TEST_HEADERS})
+			FILES ${SYSTEM_TEST_API_HEADERS} ${SYSTEM_TEST_CHANNEL_HEADERS})
 		source_group(TREE ${CMAKE_CURRENT_LIST_DIR}/coffee_machine
 			PREFIX "Source Files\\coffee_machine"
-			FILES ${SYSTEM_TEST_SOURCES})
+			FILES ${SYSTEM_TEST_API_SOURCES} ${SYSTEM_TEST_CHANNEL_SOURCES})
 	endif()
 
 	target_link_libraries(coffee_machine PRIVATE

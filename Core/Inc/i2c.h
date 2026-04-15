@@ -41,6 +41,7 @@ extern I2C_HandleTypeDef hi2c4;
 void MX_I2C4_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+HAL_StatusTypeDef App_I2C4_Init(I2C_HandleTypeDef *i2c_handle, uint32_t timing);
 
 /* USER CODE END Prototypes */
 
